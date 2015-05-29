@@ -1,1 +1,3 @@
-module.exports = {test:3};
+var angular = require('angular');
+console.dir(angular);
+window.angular = angular;
