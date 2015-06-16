@@ -1,7 +1,7 @@
 var webpack = require('webpack');
 var path = require('path');
- 
- 
+
+
  console.log('webpacking');
 module.exports = {
     context: __dirname + '/assets/js',
@@ -14,7 +14,7 @@ module.exports = {
     resolve: {
         alias: {
             //file path aliases relative to "context"
-            
+
         },
         root: ['assets/js','node_modules'],
         extensions: ['', '.webpack.js', '.web.js', '.ts', '.js'],
@@ -27,12 +27,14 @@ module.exports = {
     ],
     module: {
         loaders: [
-            {test: /\.html$/, loader: "html"},
+            {test: /\.html$/, loader: "html-loader"},
             {test:/\.ts$/,loader:'typescript-loader'}
         ],
- 
+
         noParse: [
            //path to files not to parse, good for prebuilt libs
+          /sails.io.js$/
+
         ]
     }
 };

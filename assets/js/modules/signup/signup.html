@@ -1,0 +1,7 @@
+<div ng-show="!signupCtrl.signedIn" class="signup_form  outline">
+  <h1>Sign up</h1>
+  <form >
+    <input type="text" ng-model="signupCtrl.form.username"/>
+    <input ng-click="signupCtrl.signup()" class="btn btn-primary" type="submit" placeholder="Sign up!"/>
+  </form>
+</div>

@@ -1,0 +1,15 @@
+<div class="col-xs-12 createpost">
+
+  <button ng-if="!createPostCtrl.createMode"ng-click="createPostCtrl.toggleCreateMode()">
+    Create a post
+  </button>
+
+  <div ng-if="createPostCtrl.createMode">
+    <input ng-model="createPostCtrl.form.title" type="text" name="title" placeholder="Title"/>
+    <textarea ng-model="createPostCtrl.form.contents" class="createpost-contents" name="contents" cols="40" rows="10">A new post</textarea>
+    <div class="createpost-buttons pull-right">
+      <button ng-click="createPostCtrl.create()" class="btn btn-primary">Create</button>
+      <button ng-click="createPostCtrl.toggleCreateMode()" class="btn btn-danger">Cancel</button>
+    </div>
+  </div>
+</div>
