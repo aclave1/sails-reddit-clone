@@ -4,15 +4,25 @@ module.exports = [function(){
     template:require('./postlist.html'),
     controllerAs:'postListCtrl',
     bindToController:true,
-    controller:[function(){
+    controller:['$scope','io',function($scope,io){
       var vm = this;
+      init();
 
-      vm.posts = [
-        {title:'A cool title'},
-        {title:'another post'},
-        {title:'a post'},
-        {title:'a cute cat'},
-      ];
+
+
+      function init(){
+        vm.posts = [{title:"There are currently no posts available..."}];
+        getPostList();
+      }
+
+      function getPostList(){
+        io.get('/post',function(response){
+          if(response.payload){
+            vm.posts = response.payload;
+            $scope.$evalAsync();
+          }
+        });
+      }
     }]
   };
 }];

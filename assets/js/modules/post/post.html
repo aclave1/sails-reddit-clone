@@ -1,6 +1,9 @@
 <div>
-  Post!
-  <p>{{postCtrl.postid}}</p>
-  <p>{{postCtrl.posttitle}}</p>
-  <p>{{postCtrl.postcontents}}</p>
+  <div class="outline post_main_section">
+    <h3>{{postCtrl.posttitle}}</h3>
+    <div class="outline post_contents_section">
+      <p>{{postCtrl.postcontents}}</p>
+    </div>
+  </div>
+  <comment data="comment" ></comment>
 </div>

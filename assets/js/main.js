@@ -1,6 +1,6 @@
 var libs = require('./lib');
 angular
-	.module('app',[])
+	.module('app',['ui.tree'])
 	.directive('frontPage',require('./modules/frontpage/frontpage'))
 
   .directive('signUp',require('./modules/signup/signup'))
@@ -13,6 +13,7 @@ angular
   .directive('postlistItem',require('./modules/post/postlist-item'))
   .directive('createPost',require('./modules/post/createpost'))
 
+  .directive('comment',require('./modules/comments/comment'))
 
   .factory('io',require('./SocketFactory'))
 	;

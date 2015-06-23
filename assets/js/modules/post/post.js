@@ -13,7 +13,15 @@ module.exports = [function(){
     bindToController:true,
     controller:['io',function(io){
       var vm = this;
+      init();
 
+
+      function init(){
+        io
+          .get('/post/'+vm.postid+'/comments',function(response){
+            vm.comments = response.payload;
+          });
+      }
     }]
   };
 }];

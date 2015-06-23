@@ -1,7 +1,11 @@
 module.exports = [function FrontPageDirective(){
 	return {
     scope:{},
-		template:require('./frontpage.html')
-		//template:'<div>front page!</div>'
+		template:require('./frontpage.html'),
+    controllerAs:'frontPageCtrl',
+    bindToController:true,
+		controller:[function(){
+      var vm = this;
+    }]
 	};
 }];

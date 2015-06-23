@@ -8,8 +8,8 @@
     <input ng-model="createPostCtrl.form.title" type="text" name="title" placeholder="Title"/>
     <textarea ng-model="createPostCtrl.form.contents" class="createpost-contents" name="contents" cols="40" rows="10">A new post</textarea>
     <div class="createpost-buttons pull-right">
-      <button ng-click="createPostCtrl.create()" class="btn btn-primary">Create</button>
-      <button ng-click="createPostCtrl.toggleCreateMode()" class="btn btn-danger">Cancel</button>
+      <button type="button" ng-click="createPostCtrl.create()" class="btn btn-primary">Create</button>
+      <button type="button" ng-click="createPostCtrl.toggleCreateMode()" class="btn btn-danger">Cancel</button>
     </div>
   </div>
 </div>

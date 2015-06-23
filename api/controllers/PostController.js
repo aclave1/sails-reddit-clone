@@ -7,7 +7,7 @@ module.exports = {
     return Post
       .create({
         title: params.title,
-        contents: params.contents
+        contents: params.contents,
       })
       .then(function (createdPost) {
         res.json({link:"/post/"+createdPost.id});
@@ -24,6 +24,15 @@ module.exports = {
         }
 
         return res.view('post',foundPost);
+      });
+  },
+  getAll:function(req,res){
+    return Post
+      .find()
+      .then(function(postList){
+        res.json({
+          payload:postList
+        });
       });
   }
 };

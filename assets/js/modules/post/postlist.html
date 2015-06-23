@@ -2,7 +2,9 @@
   <div>
     <ul>
       <li ng-repeat="post in postListCtrl.posts">
-        <p>{{post.title}}</p>
+        <p>
+          <a ng-href="/post/{{post.id}}">{{post.title}}</a>
+        </p>
       </li>
     </ul>
   </div>
