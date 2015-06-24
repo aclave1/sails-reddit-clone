@@ -44,24 +44,27 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var libs = __webpack_require__(1);
+	var libs = __webpack_require__(3);
 	angular
 		.module('app',['ui.tree'])
-		.directive('frontPage',__webpack_require__(5))
+		.directive('frontPage',__webpack_require__(7))
 
-	  .directive('signUp',__webpack_require__(7))
-	  .service('user',__webpack_require__(9))
-	  .directive('userDash',__webpack_require__(10))
+	  .directive('signUp',__webpack_require__(9))
+	  .service('user',__webpack_require__(11))
+	  .directive('userDash',__webpack_require__(12))
 
 
-	  .directive('post',__webpack_require__(12))
-	  .directive('postlist',__webpack_require__(14))
-	  .directive('postlistItem',__webpack_require__(16))
+	  .directive('post',__webpack_require__(14))
+	  .directive('postlist',__webpack_require__(16))
+	  .directive('postlistItem',__webpack_require__(1))
 	  .directive('createPost',__webpack_require__(18))
+	  .service('postService',__webpack_require__(20))
 
-	  .directive('comment',__webpack_require__(20))
+	  .directive('commentList',__webpack_require__(21))
+	  .directive('comment',__webpack_require__(23))
+	  .directive('createCommentBox',__webpack_require__(25))
 
-	  .factory('io',__webpack_require__(22))
+	  .factory('io',__webpack_require__(27))
 		;
 
 
@@ -74,22 +77,47 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var angular = __webpack_require__(2);
-	var tree = __webpack_require__(4);
+	module.exports = [function(){
+	  return {
+	    scope:{
+	      post:'='
+	    },
+	    template:__webpack_require__(2),
+	    controllerAs:'postListItem',
+	    bindToController:true,
+	    controller:[function(){
+
+	    }]
+	  };
+	}];
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports) {
+
+	module.exports = "<p>\n  {{postListItem.post.title}}\n</p>\n";
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var angular = __webpack_require__(4);
+	var tree = __webpack_require__(6);
 	console.dir(angular);
 	window.angular = angular;
 
 
 /***/ },
-/* 2 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(3);
+	__webpack_require__(5);
 	module.exports = angular;
 
 
 /***/ },
-/* 3 */
+/* 5 */
 /***/ function(module, exports) {
 
 	/**
@@ -28227,7 +28255,7 @@
 	!window.angular.$$csp() && window.angular.element(document).find('head').prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
 
 /***/ },
-/* 4 */
+/* 6 */
 /***/ function(module, exports) {
 
 	/**
@@ -29588,13 +29616,13 @@
 
 
 /***/ },
-/* 5 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = [function FrontPageDirective(){
 		return {
 	    scope:{},
-			template:__webpack_require__(6),
+			template:__webpack_require__(8),
 	    controllerAs:'frontPageCtrl',
 	    bindToController:true,
 			controller:[function(){
@@ -29605,19 +29633,19 @@
 
 
 /***/ },
-/* 6 */
+/* 8 */
 /***/ function(module, exports) {
 
 	module.exports = "<div>\n  <user-dash></user-dash>\n  <div class=\"col-xs-8\">\n  <postlist></postlist>\n  </div>\n  <div class=\"col-xs-4\">\n    <sign-up></sign-up>\n    <create-post></create-post>\n  </div>\n</div>\n";
 
 /***/ },
-/* 7 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(){
 	  return {
 	    scope:{},
-	    template:__webpack_require__(8),
+	    template:__webpack_require__(10),
 	    restrict:'E',
 	    bindToController:true,
 	    controllerAs:'signupCtrl',
@@ -29639,13 +29667,13 @@
 
 
 /***/ },
-/* 8 */
+/* 10 */
 /***/ function(module, exports) {
 
 	module.exports = "<div ng-show=\"!signupCtrl.signedIn\" class=\"signup_form  outline\">\n  <h1>Sign up</h1>\n  <form >\n    <input type=\"text\" ng-model=\"signupCtrl.form.username\"/>\n    <input ng-click=\"signupCtrl.signup()\" class=\"btn btn-primary\" type=\"submit\" placeholder=\"Sign up!\"/>\n  </form>\n</div>\n";
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports) {
 
 	module.exports = [function(){
@@ -29657,13 +29685,13 @@
 
 
 /***/ },
-/* 10 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = [function(){
 	  return {
 	    scope:{},
-	    template:__webpack_require__(11),
+	    template:__webpack_require__(13),
 	    bindToController:true,
 	    controllerAs:'userdashCtrl',
 	    controller:['$rootScope','user',function ($rootScope,user) {
@@ -29679,13 +29707,13 @@
 
 
 /***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports) {
 
 	module.exports = "<div>\n  {{userdashCtrl.username}}\n</div>\n";
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -29698,15 +29726,17 @@
 	      posttitle:'=',
 	      postcontents:'=',
 	    },
-	    template:__webpack_require__(13),
+	    template:__webpack_require__(15),
 	    controllerAs:'postCtrl',
 	    bindToController:true,
-	    controller:['io',function(io){
+	    controller:['io','postService',function(io,postService){
 	      var vm = this;
 	      init();
 
 
 	      function init(){
+	        postService.setCurrentPost(vm.postid);
+
 	        io
 	          .get('/post/'+vm.postid+'/comments',function(response){
 	            vm.comments = response.payload;
@@ -29718,19 +29748,19 @@
 
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports) {
 
-	module.exports = "<div>\n  <div class=\"outline post_main_section\">\n    <h3>{{postCtrl.posttitle}}</h3>\n    <div class=\"outline post_contents_section\">\n      <p>{{postCtrl.postcontents}}</p>\n    </div>\n  </div>\n  <comment data=\"comment\" ></comment>\n</div>\n";
+	module.exports = "<div>\n  <div class=\"outline post_main_section\">\n    <h3>{{postCtrl.posttitle}}</h3>\n    <div class=\"outline post_contents_section\">\n      <p>{{postCtrl.postcontents}}</p>\n    </div>\n  </div>\n  <comment-list data=\"comment\" ></comment-list>\n</div>\n";
 
 /***/ },
-/* 14 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = [function(){
 	  return {
 	    scope:{},
-	    template:__webpack_require__(15),
+	    template:__webpack_require__(17),
 	    controllerAs:'postListCtrl',
 	    bindToController:true,
 	    controller:['$scope','io',function($scope,io){
@@ -29758,35 +29788,10 @@
 
 
 /***/ },
-/* 15 */
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"outline postlist\">\n  <div>\n    <ul>\n      <li ng-repeat=\"post in postListCtrl.posts\">\n        <p>\n          <a ng-href=\"/post/{{post.id}}\">{{post.title}}</a>\n        </p>\n      </li>\n    </ul>\n  </div>\n</div>\n";
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = [function(){
-	  return {
-	    scope:{
-	      post:'='
-	    },
-	    template:__webpack_require__(17),
-	    controllerAs:'postListItem',
-	    bindToController:true,
-	    controller:[function(){
-
-	    }]
-	  };
-	}];
-
-
-/***/ },
 /* 17 */
 /***/ function(module, exports) {
 
-	module.exports = "<p>\n  {{postListItem.post.title}}\n</p>\n";
+	module.exports = "<div class=\"outline postlist\">\n  <div>\n    <ul>\n      <li ng-repeat=\"post in postListCtrl.posts\">\n        <p>\n          <a ng-href=\"/post/{{post.id}}\">{{post.title}}</a>\n        </p>\n      </li>\n    </ul>\n  </div>\n</div>\n";
 
 /***/ },
 /* 18 */
@@ -29835,21 +29840,50 @@
 
 /***/ },
 /* 20 */
+/***/ function(module, exports) {
+
+	module.exports = [function(){
+	  var srvc = this;
+
+	  var currentPost = null;
+
+	  srvc.setCurrentPost = function(postId){
+	    currentPost = typeof postId !== 'undefined' ? postId : currentPost;
+	  };
+	  srvc.getCurrentPost = function(){
+	    return currentPost;
+	  };
+	}];
+
+
+/***/ },
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * Directive for an entire post page
 	 * */
-	module.exports = [function(){
+	module.exports = [function () {
 	  return {
-	    scope:{
-	     data:'='
+	    scope: {
+	      data: '='
 	    },
-	    template:__webpack_require__(21),
-	    controllerAs:'commentCtrl',
-	    bindToController:true,
-	    controller:['io',function(io){
+	    template: __webpack_require__(22),
+	    controllerAs: 'commentsCtrl',
+	    bindToController: true,
+	    controller: ['io', function (io) {
 	      var vm = this;
+	      vm.nodes = [{
+	        id: 1,
+	        title: 'top level',
+	        nodes: [{
+	          id: 3,
+	          title: 'second level',
+	          nodes: [
+	            {id: 5, title: 'third level', nodes: []}
+	          ]
+	        }]
+	      }];
 
 	    }]
 	  };
@@ -29857,24 +29891,104 @@
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"outline comments\">\n\n</div>\n";
+	module.exports = "<div class=\"outline comments\">\n\n  <create-comment-box></create-comment-box>\n\n  <script type=\"text/ng-template\" id=\"nodes_renderer.html\">\n    <comment data=\"node\"></comment>\n    <ol ui-tree-nodes=\"\" ng-model=\"node.nodes\">\n      <li ng-repeat=\"node in node.nodes\" ui-tree-node ng-include=\"'nodes_renderer.html'\">\n      </li>\n    </ol>\n  </script>\n  <div ui-tree data-drag-enabled=\"false\">\n    <ol ui-tree-nodes=\"\" ng-model=\"commentsCtrl.nodes\" id=\"tree-root\">\n      <li ng-repeat=\"node in commentsCtrl.nodes\" ui-tree-node ng-include=\"'nodes_renderer.html'\"></li>\n    </ol>\n  </div>\n</div>\n";
 
 /***/ },
-/* 22 */
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Directive for an entire post page
+	 * */
+	module.exports = [function () {
+	  return {
+	    scope: {
+	      data: '='
+	    },
+	    template: __webpack_require__(24),
+	    controllerAs: 'commentCtrl',
+	    bindToController: true,
+	    controller: [function () {
+	      var vm = this;
+	      vm.toggleReply = toggleReply;
+	      init();
+
+
+	      function init(){
+	        vm.reply = false;
+	      }
+
+	      function toggleReply(){
+	        vm.reply = !vm.reply;
+	      }
+	    }]
+	  };
+	}];
+
+
+/***/ },
+/* 24 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"outline comment\">\n  {{commentCtrl.data.title}}\n  <div class=\"comment-actionbar\">\n    <a ng-click=\"commentCtrl.toggleReply()\">reply</a>\n    <a href=\"#\">report</a>\n  </div>\n  <div>\n    <div ng-if=\"commentCtrl.reply\">\n      <create-comment-box data=\"commentCtrl.data\"></create-comment-box>\n    </div>\n  </div>\n</div>\n";
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = [function () {
+	  return {
+	    scope: {
+	      data: '='
+	    },
+	    template: __webpack_require__(26),
+	    controllerAs: 'createCtrl',
+	    bindToController: true,
+	    controller: ['io','postService', function (io,postService) {
+	      var vm = this;
+	      init();
+
+
+
+	      function init(){
+	        vm.form = {
+	          text:'enter a comment here',
+	          parent:getParentCommentId(),
+	          post:postService.getCurrentPost()
+	        };
+	      }
+
+	      function getParentCommentId(){
+	        return typeof vm.data !== 'undefined' ? vm.data.id : null;
+	      }
+
+	    }]
+	  };
+	}];
+
+
+/***/ },
+/* 26 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"create-comment-box\">\n  <textarea>{{createCtrl.form.text}}</textarea>\n</div>\n";
+
+/***/ },
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	var io = __webpack_require__(23);
+	var io = __webpack_require__(28);
 	module.exports = [function () {
 	    return io().socket;
 	}];
 
 
 /***/ },
-/* 23 */
+/* 28 */
 /***/ function(module, exports) {
 
 	// socket.io-1.2.1

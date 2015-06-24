@@ -11,12 +11,14 @@ module.exports = [function(){
     template:require('./post.html'),
     controllerAs:'postCtrl',
     bindToController:true,
-    controller:['io',function(io){
+    controller:['io','postService',function(io,postService){
       var vm = this;
       init();
 
 
       function init(){
+        postService.setCurrentPost(vm.postid);
+
         io
           .get('/post/'+vm.postid+'/comments',function(response){
             vm.comments = response.payload;

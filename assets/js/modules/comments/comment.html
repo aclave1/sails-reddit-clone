@@ -1,3 +1,12 @@
-<div class="outline comments">
-
+<div class="outline comment">
+  {{commentCtrl.data.title}}
+  <div class="comment-actionbar">
+    <a ng-click="commentCtrl.toggleReply()">reply</a>
+    <a href="#">report</a>
+  </div>
+  <div>
+    <div ng-if="commentCtrl.reply">
+      <create-comment-box data="commentCtrl.data"></create-comment-box>
+    </div>
+  </div>
 </div>

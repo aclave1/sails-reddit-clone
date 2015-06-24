@@ -12,8 +12,11 @@ angular
   .directive('postlist',require('./modules/post/postlist'))
   .directive('postlistItem',require('./modules/post/postlist-item'))
   .directive('createPost',require('./modules/post/createpost'))
+  .service('postService',require('./modules/post/postservice'))
 
+  .directive('commentList',require('./modules/comments/comment-list'))
   .directive('comment',require('./modules/comments/comment'))
+  .directive('createCommentBox',require('./modules/comments/create-comment-box'))
 
   .factory('io',require('./SocketFactory'))
 	;
