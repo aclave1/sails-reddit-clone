@@ -8,6 +8,6 @@ module.exports.routes = {
   'get /post':'PostController.getAll',
 
   'get /post/:id':'PostController.viewPost',
-  'get /post/:id/comment':'CommentController.getComments',
-  'post /post/:id/comment':'CommentController.createComment',
+  'get /post/:post/comment':'CommentController.getComments',
+  'post /post/:post/comment':'CommentController.createComment',
 };

@@ -8,16 +8,23 @@ module.exports = [function () {
     bindToController: true,
     controller: ['io','postService', function (io,postService) {
       var vm = this;
+      vm.submit = submit;
       init();
 
 
 
       function init(){
         vm.form = {
-          text:'enter a comment here',
+          contents:'enter a comment here',
           parent:getParentCommentId(),
-          post:postService.getCurrentPost()
         };
+      }
+
+      function submit(){
+        var url = '/post/'+postService.getCurrentPost()+'/comment';
+        io.post(url,vm.form,function(response){
+          debugger;
+        });
       }
 
       function getParentCommentId(){

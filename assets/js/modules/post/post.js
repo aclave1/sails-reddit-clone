@@ -18,11 +18,6 @@ module.exports = [function(){
 
       function init(){
         postService.setCurrentPost(vm.postid);
-
-        io
-          .get('/post/'+vm.postid+'/comments',function(response){
-            vm.comments = response.payload;
-          });
       }
     }]
   };

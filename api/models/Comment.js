@@ -1,7 +1,9 @@
 module.exports = {
 	attributes:{
     contents:'string',
-    parent:'comment',
+    parent:{
+      model:'comment'
+    },
 		post:{
       model:'post'
     }

@@ -1,3 +1,4 @@
 <div class="create-comment-box">
-  <textarea>{{createCtrl.form.text}}</textarea>
+  <textarea ng-model="createCtrl.form.contents"></textarea>
+  <button ng-click="createCtrl.submit()">comment</button>
 </div>
