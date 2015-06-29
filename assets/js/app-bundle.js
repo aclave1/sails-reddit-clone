@@ -42017,13 +42017,13 @@
 
 	module.exports = [function FrontPageDirective(){
 		return {
-	    scope:{},
-			template:__webpack_require__(8),
-	    controllerAs:'frontPageCtrl',
-	    bindToController:true,
+		    scope:{},
+				template:__webpack_require__(8),
+		    controllerAs:'frontPageCtrl',
+		    bindToController:true,
 			controller:[function(){
-	      var vm = this;
-	    }]
+		      	var vm = this;
+		    }]
 		};
 	}];
 
@@ -42164,6 +42164,7 @@
 	      function init(){
 	        vm.posts = [{title:"There are currently no posts available..."}];
 	        getPostList();
+	        initFrontPage();
 	      }
 
 	      function getPostList(){
@@ -42174,6 +42175,12 @@
 	          }
 	        });
 	      }
+	      function initFrontPage(){
+	        io.on('POST:CREATE',function(message){
+	          vm.posts.push(message.payload);
+	          $scope.$evalAsync();
+	        });
+	      } 
 	    }]
 	  };
 	}];

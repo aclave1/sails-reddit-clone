@@ -13,6 +13,7 @@ module.exports = [function(){
       function init(){
         vm.posts = [{title:"There are currently no posts available..."}];
         getPostList();
+        initFrontPage();
       }
 
       function getPostList(){
@@ -23,6 +24,12 @@ module.exports = [function(){
           }
         });
       }
+      function initFrontPage(){
+        io.on('POST:CREATE',function(message){
+          vm.posts.push(message.payload);
+          $scope.$evalAsync();
+        });
+      } 
     }]
   };
 }];

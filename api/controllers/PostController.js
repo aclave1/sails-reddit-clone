@@ -10,7 +10,10 @@ module.exports = {
         contents: params.contents,
       })
       .then(function (createdPost) {
-        subscribeSocketToPost(req,createdPost);
+        var message = {
+          payload:createdPost
+        };
+        notifyFrontPageRoom(req,message);
         res.json({link:"/post/"+createdPost.id});
       });
   },
@@ -38,7 +41,7 @@ module.exports = {
       });
 
       subscribeSocketToPost(req,post);
-      
+
       res.status(200);
       return res.json({status:"success"});
   },
@@ -46,6 +49,8 @@ module.exports = {
     return Post
       .find()
       .then(function(postList){
+
+        sails.sockets.join(req.socket,'frontpage');
         res.json({
           payload:postList
         });
@@ -67,4 +72,8 @@ function unsubscribeSocketFromPost(req,post){
 function getRoomNameFromPostId(postId){
   if(!(postId)) throw new Error('cannot build room name for post: '+post);
   return "post/"+postId;
+}
+
+function notifyFrontPageRoom(req,message){
+  sails.sockets.broadcast('frontpage','POST:CREATE',message,req.socket);
 }
