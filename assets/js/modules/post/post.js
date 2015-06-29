@@ -18,6 +18,7 @@ module.exports = [function(){
 
       function init(){
         postService.setCurrentPost(vm.postid);
+        postService.subscribeToCurrentPost();
       }
     }]
   };

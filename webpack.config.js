@@ -36,5 +36,10 @@ module.exports = {
           /sails.io.js$/
 
         ]
+    },
+    devServer: {
+        contentBase: "./tmp/public",
+        hot: true,
+        inline: true
     }
 };

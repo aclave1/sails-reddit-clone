@@ -16,11 +16,11 @@ module.exports = [function () {
 
 
       function init(){
-        vm.reply = false;
+        vm.data.reply = false;
       }
 
       function toggleReply(){
-        vm.reply = !vm.reply;
+        vm.data.reply = !vm.data.reply;
       }
     }]
   };

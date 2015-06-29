@@ -1,4 +1,4 @@
-module.exports = [function(){
+module.exports = ['io',function(io){
   var srvc = this;
 
   var currentPost = null;
@@ -9,4 +9,13 @@ module.exports = [function(){
   srvc.getCurrentPost = function(){
     return currentPost;
   };
+
+  srvc.subscribeToCurrentPost = function(){
+  	io.get('/post/'+srvc.getCurrentPost()+'/subscribe',function(response){
+  		
+  	});
+  };
+  function watchPostMessages(){
+  	console.log('watching post messages');
+  }
 }];

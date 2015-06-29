@@ -44,27 +44,28 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var libs = __webpack_require__(3);
+	var libs = __webpack_require__(1);
 	angular
 		.module('app',['ui.tree'])
-		.directive('frontPage',__webpack_require__(9))
+		.directive('frontPage',__webpack_require__(7))
 
-	  .directive('signUp',__webpack_require__(11))
-	  .service('user',__webpack_require__(13))
-	  .directive('userDash',__webpack_require__(14))
+	  .directive('signUp',__webpack_require__(9))
+	  .service('user',__webpack_require__(11))
+	  .directive('userDash',__webpack_require__(12))
 
 
-	  .directive('post',__webpack_require__(16))
-	  .directive('postlist',__webpack_require__(18))
-	  .directive('postlistItem',__webpack_require__(1))
+	  .directive('post',__webpack_require__(14))
+	  .directive('postlist',__webpack_require__(16))
+	  .directive('postlistItem',__webpack_require__(18))
 	  .directive('createPost',__webpack_require__(20))
 	  .service('postService',__webpack_require__(22))
 
 	  .directive('commentList',__webpack_require__(23))
 	  .directive('comment',__webpack_require__(25))
 	  .directive('createCommentBox',__webpack_require__(27))
+	  .service('commentService',__webpack_require__(29))
 
-	  .factory('io',__webpack_require__(29))
+	  .factory('io',__webpack_require__(30))
 		;
 
 
@@ -77,40 +78,15 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = [function(){
-	  return {
-	    scope:{
-	      post:'='
-	    },
-	    template:__webpack_require__(2),
-	    controllerAs:'postListItem',
-	    bindToController:true,
-	    controller:[function(){
-
-	    }]
-	  };
-	}];
-
-
-/***/ },
-/* 2 */
-/***/ function(module, exports) {
-
-	module.exports = "<p>\n  {{postListItem.post.title}}\n</p>\n";
-
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	window._ = __webpack_require__(4);
-	var angular = __webpack_require__(6);
-	var tree = __webpack_require__(8);
+	window._ = __webpack_require__(2);
+	var angular = __webpack_require__(4);
+	var tree = __webpack_require__(6);
 	console.dir(angular);
 	window.angular = angular;
 
 
 /***/ },
-/* 4 */
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/**
@@ -12349,10 +12325,10 @@
 	  }
 	}.call(this));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)(module), (function() { return this; }())))
 
 /***/ },
-/* 5 */
+/* 3 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -12368,19 +12344,19 @@
 
 
 /***/ },
-/* 6 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(7);
+	__webpack_require__(5);
 	module.exports = angular;
 
 
 /***/ },
-/* 7 */
+/* 5 */
 /***/ function(module, exports) {
 
 	/**
-	 * @license AngularJS v1.4.0
+	 * @license AngularJS v1.4.1
 	 * (c) 2010-2015 Google, Inc. http://angularjs.org
 	 * License: MIT
 	 */
@@ -12438,7 +12414,7 @@
 	      return match;
 	    });
 
-	    message += '\nhttp://errors.angularjs.org/1.4.0/' +
+	    message += '\nhttp://errors.angularjs.org/1.4.1/' +
 	      (module ? module + '/' : '') + code;
 
 	    for (i = SKIP_INDEXES, paramPrefix = '?'; i < templateArgs.length; i++, paramPrefix = '&') {
@@ -13245,9 +13221,18 @@
 
 	  if (!destination) {
 	    destination = source;
-	    if (source) {
+	    if (isObject(source)) {
+	      var index;
+	      if (stackSource && (index = stackSource.indexOf(source)) !== -1) {
+	        return stackDest[index];
+	      }
+
+	      // TypedArray, Date and RegExp have specific copy functionality and must be
+	      // pushed onto the stack before returning.
+	      // Array and other objects create the base object and recurse to copy child
+	      // objects. The array/object will be pushed onto the stack when recursed.
 	      if (isArray(source)) {
-	        destination = copy(source, [], stackSource, stackDest);
+	        return copy(source, [], stackSource, stackDest);
 	      } else if (isTypedArray(source)) {
 	        destination = new source.constructor(source);
 	      } else if (isDate(source)) {
@@ -13255,9 +13240,14 @@
 	      } else if (isRegExp(source)) {
 	        destination = new RegExp(source.source, source.toString().match(/[^\/]*$/)[0]);
 	        destination.lastIndex = source.lastIndex;
-	      } else if (isObject(source)) {
+	      } else {
 	        var emptyObject = Object.create(getPrototypeOf(source));
-	        destination = copy(source, emptyObject, stackSource, stackDest);
+	        return copy(source, emptyObject, stackSource, stackDest);
+	      }
+
+	      if (stackDest) {
+	        stackSource.push(source);
+	        stackDest.push(destination);
 	      }
 	    }
 	  } else {
@@ -13268,9 +13258,6 @@
 	    stackDest = stackDest || [];
 
 	    if (isObject(source)) {
-	      var index = stackSource.indexOf(source);
-	      if (index !== -1) return stackDest[index];
-
 	      stackSource.push(source);
 	      stackDest.push(destination);
 	    }
@@ -13279,12 +13266,7 @@
 	    if (isArray(source)) {
 	      destination.length = 0;
 	      for (var i = 0; i < source.length; i++) {
-	        result = copy(source[i], null, stackSource, stackDest);
-	        if (isObject(source[i])) {
-	          stackSource.push(source[i]);
-	          stackDest.push(result);
-	        }
-	        destination.push(result);
+	        destination.push(copy(source[i], null, stackSource, stackDest));
 	      }
 	    } else {
 	      var h = destination.$$hashKey;
@@ -13298,20 +13280,20 @@
 	      if (isBlankObject(source)) {
 	        // createMap() fast path --- Safe to avoid hasOwnProperty check because prototype chain is empty
 	        for (key in source) {
-	          putValue(key, source[key], destination, stackSource, stackDest);
+	          destination[key] = copy(source[key], null, stackSource, stackDest);
 	        }
 	      } else if (source && typeof source.hasOwnProperty === 'function') {
 	        // Slow path, which must rely on hasOwnProperty
 	        for (key in source) {
 	          if (source.hasOwnProperty(key)) {
-	            putValue(key, source[key], destination, stackSource, stackDest);
+	            destination[key] = copy(source[key], null, stackSource, stackDest);
 	          }
 	        }
 	      } else {
 	        // Slowest path --- hasOwnProperty can't be called as a method
 	        for (key in source) {
 	          if (hasOwnProperty.call(source, key)) {
-	            putValue(key, source[key], destination, stackSource, stackDest);
+	            destination[key] = copy(source[key], null, stackSource, stackDest);
 	          }
 	        }
 	      }
@@ -13319,16 +13301,6 @@
 	    }
 	  }
 	  return destination;
-
-	  function putValue(key, val, destination, stackSource, stackDest) {
-	    // No context allocation, trivial outer scope, easily inlined
-	    var result = copy(val, null, stackSource, stackDest);
-	    if (isObject(val)) {
-	      stackSource.push(val);
-	      stackDest.push(result);
-	    }
-	    destination[key] = result;
-	  }
 	}
 
 	/**
@@ -14386,7 +14358,7 @@
 	           * @description
 	           * See {@link auto.$provide#provider $provide.provider()}.
 	           */
-	          provider: invokeLater('$provide', 'provider'),
+	          provider: invokeLaterAndSetModuleName('$provide', 'provider'),
 
 	          /**
 	           * @ngdoc method
@@ -14397,7 +14369,7 @@
 	           * @description
 	           * See {@link auto.$provide#factory $provide.factory()}.
 	           */
-	          factory: invokeLater('$provide', 'factory'),
+	          factory: invokeLaterAndSetModuleName('$provide', 'factory'),
 
 	          /**
 	           * @ngdoc method
@@ -14408,7 +14380,7 @@
 	           * @description
 	           * See {@link auto.$provide#service $provide.service()}.
 	           */
-	          service: invokeLater('$provide', 'service'),
+	          service: invokeLaterAndSetModuleName('$provide', 'service'),
 
 	          /**
 	           * @ngdoc method
@@ -14443,7 +14415,7 @@
 	           * @description
 	           * See {@link auto.$provide#decorator $provide.decorator()}.
 	           */
-	          decorator: invokeLater('$provide', 'decorator'),
+	          decorator: invokeLaterAndSetModuleName('$provide', 'decorator'),
 
 	          /**
 	           * @ngdoc method
@@ -14477,7 +14449,7 @@
 	           * See {@link ng.$animateProvider#register $animateProvider.register()} and
 	           * {@link ngAnimate ngAnimate module} for more information.
 	           */
-	          animation: invokeLater('$animateProvider', 'register'),
+	          animation: invokeLaterAndSetModuleName('$animateProvider', 'register'),
 
 	          /**
 	           * @ngdoc method
@@ -14495,7 +14467,7 @@
 	           * (`myapp_subsection_filterx`).
 	           * </div>
 	           */
-	          filter: invokeLater('$filterProvider', 'register'),
+	          filter: invokeLaterAndSetModuleName('$filterProvider', 'register'),
 
 	          /**
 	           * @ngdoc method
@@ -14507,7 +14479,7 @@
 	           * @description
 	           * See {@link ng.$controllerProvider#register $controllerProvider.register()}.
 	           */
-	          controller: invokeLater('$controllerProvider', 'register'),
+	          controller: invokeLaterAndSetModuleName('$controllerProvider', 'register'),
 
 	          /**
 	           * @ngdoc method
@@ -14520,7 +14492,7 @@
 	           * @description
 	           * See {@link ng.$compileProvider#directive $compileProvider.directive()}.
 	           */
-	          directive: invokeLater('$compileProvider', 'directive'),
+	          directive: invokeLaterAndSetModuleName('$compileProvider', 'directive'),
 
 	          /**
 	           * @ngdoc method
@@ -14567,6 +14539,19 @@
 	          if (!queue) queue = invokeQueue;
 	          return function() {
 	            queue[insertMethod || 'push']([provider, method, arguments]);
+	            return moduleInstance;
+	          };
+	        }
+
+	        /**
+	         * @param {string} provider
+	         * @param {string} method
+	         * @returns {angular.Module}
+	         */
+	        function invokeLaterAndSetModuleName(provider, method) {
+	          return function(recipeName, factoryFunction) {
+	            if (factoryFunction && isFunction(factoryFunction)) factoryFunction.$$moduleName = name;
+	            invokeQueue.push([provider, method, arguments]);
 	            return moduleInstance;
 	          };
 	        }
@@ -14713,11 +14698,11 @@
 	 * - `codeName` – `{string}` – Code name of the release, such as "jiggling-armfat".
 	 */
 	var version = {
-	  full: '1.4.0',    // all of these placeholder strings will be replaced by grunt's
+	  full: '1.4.1',    // all of these placeholder strings will be replaced by grunt's
 	  major: 1,    // package task
 	  minor: 4,
-	  dot: 0,
-	  codeName: 'jaracimrman-existence'
+	  dot: 1,
+	  codeName: 'hyperionic-illumination'
 	};
 
 
@@ -15041,6 +15026,13 @@
 	  // Otherwise we are only interested in elements (1) and documents (9)
 	  var nodeType = node.nodeType;
 	  return nodeType === NODE_TYPE_ELEMENT || !nodeType || nodeType === NODE_TYPE_DOCUMENT;
+	}
+
+	function jqLiteHasData(node) {
+	  for (var key in jqCache[node.ng339]) {
+	    return true;
+	  }
+	  return false;
 	}
 
 	function jqLiteBuildFragment(html, context) {
@@ -15417,7 +15409,8 @@
 
 	forEach({
 	  data: jqLiteData,
-	  removeData: jqLiteRemoveData
+	  removeData: jqLiteRemoveData,
+	  hasData: jqLiteHasData
 	}, function(fn, name) {
 	  JQLite[name] = fn;
 	});
@@ -16626,7 +16619,7 @@
 	          }));
 
 
-	  forEach(loadModules(modulesToLoad), function(fn) { instanceInjector.invoke(fn || noop); });
+	  forEach(loadModules(modulesToLoad), function(fn) { if (fn) instanceInjector.invoke(fn); });
 
 	  return instanceInjector;
 
@@ -17849,7 +17842,7 @@
 	        // Do the assignment again so that those two variables are referentially identical.
 	        lastHistoryState = cachedState;
 	      } else {
-	        if (!sameBase) {
+	        if (!sameBase || reloadLocation) {
 	          reloadLocation = url;
 	        }
 	        if (replace) {
@@ -18855,12 +18848,15 @@
 	 *   * `controller` - the directive's required controller instance(s) - Instances are shared
 	 *     among all directives, which allows the directives to use the controllers as a communication
 	 *     channel. The exact value depends on the directive's `require` property:
+	 *       * no controller(s) required: the directive's own controller, or `undefined` if it doesn't have one
 	 *       * `string`: the controller instance
 	 *       * `array`: array of controller instances
-	 *       * no controller(s) required: `undefined`
 	 *
 	 *     If a required controller cannot be found, and it is optional, the instance is `null`,
 	 *     otherwise the {@link error:$compile:ctreq Missing Required Controller} error is thrown.
+	 *
+	 *     Note that you can also require the directive's own controller - it will be made available like
+	 *     like any other controller.
 	 *
 	 *   * `transcludeFn` - A transclude linking function pre-bound to the correct transclusion scope.
 	 *     This is the same as the `$transclude`
@@ -19308,6 +19304,7 @@
 	                if (isObject(bindings.isolateScope)) {
 	                  directive.$$isolateBindings = bindings.isolateScope;
 	                }
+	                directive.$$moduleName = directiveFactory.$$moduleName;
 	                directives.push(directive);
 	              } catch (e) {
 	                $exceptionHandler(e);
@@ -19879,8 +19876,7 @@
 
 	            if (nodeLinkFn.transcludeOnThisElement) {
 	              childBoundTranscludeFn = createBoundTranscludeFn(
-	                  scope, nodeLinkFn.transclude, parentBoundTranscludeFn,
-	                  nodeLinkFn.elementTranscludeOnThisElement);
+	                  scope, nodeLinkFn.transclude, parentBoundTranscludeFn);
 
 	            } else if (!nodeLinkFn.templateOnThisElement && parentBoundTranscludeFn) {
 	              childBoundTranscludeFn = parentBoundTranscludeFn;
@@ -19902,7 +19898,7 @@
 	      }
 	    }
 
-	    function createBoundTranscludeFn(scope, transcludeFn, previousBoundTranscludeFn, elementTransclusion) {
+	    function createBoundTranscludeFn(scope, transcludeFn, previousBoundTranscludeFn) {
 
 	      var boundTranscludeFn = function(transcludedScope, cloneFn, controllers, futureParentElement, containingScope) {
 
@@ -20001,6 +19997,13 @@
 	          }
 	          break;
 	        case NODE_TYPE_TEXT: /* Text Node */
+	          if (msie === 11) {
+	            // Workaround for #11781
+	            while (node.parentNode && node.nextSibling && node.nextSibling.nodeType === NODE_TYPE_TEXT) {
+	              node.nodeValue = node.nodeValue + node.nextSibling.nodeValue;
+	              node.parentNode.removeChild(node.nextSibling);
+	            }
+	          }
 	          addTextInterpolateDirective(directives, node.nodeValue);
 	          break;
 	        case NODE_TYPE_COMMENT: /* Comment */
@@ -20293,7 +20296,6 @@
 
 	      nodeLinkFn.scope = newScopeDirective && newScopeDirective.scope === true;
 	      nodeLinkFn.transcludeOnThisElement = hasTranscludeDirective;
-	      nodeLinkFn.elementTranscludeOnThisElement = hasElementTranscludeDirective;
 	      nodeLinkFn.templateOnThisElement = hasTemplate;
 	      nodeLinkFn.transclude = childTranscludeFn;
 
@@ -20454,9 +20456,12 @@
 	          for (i in elementControllers) {
 	            controller = elementControllers[i];
 	            var controllerResult = controller();
+
 	            if (controllerResult !== controller.instance) {
+	              // If the controller constructor has a return value, overwrite the instance
+	              // from setupControllers and update the element data
 	              controller.instance = controllerResult;
-	              $element.data('$' + directive.name + 'Controller', controllerResult);
+	              $element.data('$' + i + 'Controller', controllerResult);
 	              if (controller === controllerForBindings) {
 	                // Remove and re-install bindToController bindings
 	                thisLinkFn.$$destroyBindings();
@@ -20756,11 +20761,18 @@
 	      return a.index - b.index;
 	    }
 
-
 	    function assertNoDuplicate(what, previousDirective, directive, element) {
+
+	      function wrapModuleNameIfDefined(moduleName) {
+	        return moduleName ?
+	          (' (module: ' + moduleName + ')') :
+	          '';
+	      }
+
 	      if (previousDirective) {
-	        throw $compileMinErr('multidir', 'Multiple directives [{0}, {1}] asking for {2} on: {3}',
-	            previousDirective.name, directive.name, what, startingTag(element));
+	        throw $compileMinErr('multidir', 'Multiple directives [{0}{1}, {2}{3}] asking for {4} on: {5}',
+	            previousDirective.name, wrapModuleNameIfDefined(previousDirective.$$moduleName),
+	            directive.name, wrapModuleNameIfDefined(directive.$$moduleName), what, startingTag(element));
 	      }
 	    }
 
@@ -20941,26 +20953,28 @@
 	      var fragment = document.createDocumentFragment();
 	      fragment.appendChild(firstElementToRemove);
 
-	      // Copy over user data (that includes Angular's $scope etc.). Don't copy private
-	      // data here because there's no public interface in jQuery to do that and copying over
-	      // event listeners (which is the main use of private data) wouldn't work anyway.
-	      jqLite(newNode).data(jqLite(firstElementToRemove).data());
+	      if (jqLite.hasData(firstElementToRemove)) {
+	        // Copy over user data (that includes Angular's $scope etc.). Don't copy private
+	        // data here because there's no public interface in jQuery to do that and copying over
+	        // event listeners (which is the main use of private data) wouldn't work anyway.
+	        jqLite(newNode).data(jqLite(firstElementToRemove).data());
 
-	      // Remove data of the replaced element. We cannot just call .remove()
-	      // on the element it since that would deallocate scope that is needed
-	      // for the new node. Instead, remove the data "manually".
-	      if (!jQuery) {
-	        delete jqLite.cache[firstElementToRemove[jqLite.expando]];
-	      } else {
-	        // jQuery 2.x doesn't expose the data storage. Use jQuery.cleanData to clean up after
-	        // the replaced element. The cleanData version monkey-patched by Angular would cause
-	        // the scope to be trashed and we do need the very same scope to work with the new
-	        // element. However, we cannot just cache the non-patched version and use it here as
-	        // that would break if another library patches the method after Angular does (one
-	        // example is jQuery UI). Instead, set a flag indicating scope destroying should be
-	        // skipped this one time.
-	        skipDestroyOnNextJQueryCleanData = true;
-	        jQuery.cleanData([firstElementToRemove]);
+	        // Remove data of the replaced element. We cannot just call .remove()
+	        // on the element it since that would deallocate scope that is needed
+	        // for the new node. Instead, remove the data "manually".
+	        if (!jQuery) {
+	          delete jqLite.cache[firstElementToRemove[jqLite.expando]];
+	        } else {
+	          // jQuery 2.x doesn't expose the data storage. Use jQuery.cleanData to clean up after
+	          // the replaced element. The cleanData version monkey-patched by Angular would cause
+	          // the scope to be trashed and we do need the very same scope to work with the new
+	          // element. However, we cannot just cache the non-patched version and use it here as
+	          // that would break if another library patches the method after Angular does (one
+	          // example is jQuery UI). Instead, set a flag indicating scope destroying should be
+	          // skipped this one time.
+	          skipDestroyOnNextJQueryCleanData = true;
+	          jQuery.cleanData([firstElementToRemove]);
+	        }
 	      }
 
 	      for (var k = 1, kk = elementsToRemove.length; k < kk; k++) {
@@ -21001,9 +21015,19 @@
 	        lastValue,
 	        parentGet, parentSet, compare;
 
+	        if (!hasOwnProperty.call(attrs, attrName)) {
+	          // In the case of user defined a binding with the same name as a method in Object.prototype but didn't set
+	          // the corresponding attribute. We need to make sure subsequent code won't access to the prototype function
+	          attrs[attrName] = undefined;
+	        }
+
 	        switch (mode) {
 
 	          case '@':
+	            if (!attrs[attrName] && !optional) {
+	              destination[scopeName] = undefined;
+	            }
+
 	            attrs.$observe(attrName, function(value) {
 	              destination[scopeName] = value;
 	            });
@@ -21020,6 +21044,7 @@
 	              return;
 	            }
 	            parentGet = $parse(attrs[attrName]);
+
 	            if (parentGet.literal) {
 	              compare = equals;
 	            } else {
@@ -21058,9 +21083,6 @@
 	            break;
 
 	          case '&':
-	            // Don't assign Object.prototype method to scope
-	            if (!attrs.hasOwnProperty(attrName) && optional) break;
-
 	            parentGet = $parse(attrs[attrName]);
 
 	            // Don't assign noop to destination if expression is not valid
@@ -21461,13 +21483,17 @@
 	   * @name $httpParamSerializer
 	   * @description
 	   *
-	   * Default $http params serializer that converts objects to a part of a request URL
+	   * Default {@link $http `$http`} params serializer that converts objects to strings
 	   * according to the following rules:
+	   *
 	   * * `{'foo': 'bar'}` results in `foo=bar`
 	   * * `{'foo': Date.now()}` results in `foo=2015-04-01T09%3A50%3A49.262Z` (`toISOString()` and encoded representation of a Date object)
 	   * * `{'foo': ['bar', 'baz']}` results in `foo=bar&foo=baz` (repeated key for each array element)
 	   * * `{'foo': {'bar':'baz'}}` results in `foo=%7B%22bar%22%3A%22baz%22%7D"` (stringified and encoded representation of an object)
+	   *
+	   * Note that serializer will sort the request parameters alphabetically.
 	   * */
+
 	  this.$get = function() {
 	    return function ngParamSerializer(params) {
 	      if (!params) return '';
@@ -21494,7 +21520,43 @@
 	   * @name $httpParamSerializerJQLike
 	   * @description
 	   *
-	   * Alternative $http params serializer that follows jQuery's [`param()`](http://api.jquery.com/jquery.param/) method logic.
+	   * Alternative {@link $http `$http`} params serializer that follows
+	   * jQuery's [`param()`](http://api.jquery.com/jquery.param/) method logic.
+	   * The serializer will also sort the params alphabetically.
+	   *
+	   * To use it for serializing `$http` request parameters, set it as the `paramSerializer` property:
+	   *
+	   * ```js
+	   * $http({
+	   *   url: myUrl,
+	   *   method: 'GET',
+	   *   params: myParams,
+	   *   paramSerializer: '$httpParamSerializerJQLike'
+	   * });
+	   * ```
+	   *
+	   * It is also possible to set it as the default `paramSerializer` in the
+	   * {@link $httpProvider#defaults `$httpProvider`}.
+	   *
+	   * Additionally, you can inject the serializer and use it explicitly, for example to serialize
+	   * form data for submission:
+	   *
+	   * ```js
+	   * .controller(function($http, $httpParamSerializerJQLike) {
+	   *   //...
+	   *
+	   *   $http({
+	   *     url: myUrl,
+	   *     method: 'POST',
+	   *     data: $httpParamSerializerJQLike(myData),
+	   *     headers: {
+	   *       'Content-Type': 'application/x-www-form-urlencoded'
+	   *     }
+	   *   });
+	   *
+	   * });
+	   * ```
+	   *
 	   * */
 	  this.$get = function() {
 	    return function jQueryLikeParamSerializer(params) {
@@ -21668,10 +21730,11 @@
 	   *     - **`defaults.headers.put`**
 	   *     - **`defaults.headers.patch`**
 	   *
-	   * - **`defaults.paramSerializer`** - {string|function(Object<string,string>):string} - A function used to prepare string representation
-	   * of request parameters (specified as an object).
-	   * If specified as string, it is interpreted as a function registered with the {@link auto.$injector $injector}.
-	   * Defaults to {@link ng.$httpParamSerializer $httpParamSerializer}.
+	   *
+	   * - **`defaults.paramSerializer`** - `{string|function(Object<string,string>):string}` - A function
+	   *  used to the prepare string representation of request parameters (specified as an object).
+	   *  If specified as string, it is interpreted as a function registered with the {@link auto.$injector $injector}.
+	   *  Defaults to {@link ng.$httpParamSerializer $httpParamSerializer}.
 	   *
 	   **/
 	  var defaults = this.defaults = {
@@ -22137,15 +22200,17 @@
 	     * properties of either $httpProvider.defaults at config-time, $http.defaults at run-time,
 	     * or the per-request config object.
 	     *
+	     * In order to prevent collisions in environments where multiple Angular apps share the
+	     * same domain or subdomain, we recommend that each application uses unique cookie name.
+	     *
 	     *
 	     * @param {object} config Object describing the request to be made and how it should be
 	     *    processed. The object has following properties:
 	     *
 	     *    - **method** – `{string}` – HTTP method (e.g. 'GET', 'POST', etc)
 	     *    - **url** – `{string}` – Absolute or relative URL of the resource that is being requested.
-	     *    - **params** – `{Object.<string|Object>}` – Map of strings or objects which will be turned
-	     *      to `?key1=value1&key2=value2` after the url. If the value is not a string, it will be
-	     *      JSONified.
+	     *    - **params** – `{Object.<string|Object>}` – Map of strings or objects which will be serialized
+	     *      with the `paramSerializer` and appended as GET parameters.
 	     *    - **data** – `{string|Object}` – Data to be sent as the request message data.
 	     *    - **headers** – `{Object}` – Map of strings or functions which return strings representing
 	     *      HTTP headers to send to the server. If the return value of a function is null, the
@@ -22163,10 +22228,14 @@
 	     *      transform function or an array of such functions. The transform function takes the http
 	     *      response body, headers and status and returns its transformed (typically deserialized) version.
 	     *      See {@link ng.$http#overriding-the-default-transformations-per-request
-	     *      Overriding the Default Transformations}
-	     *    - **paramSerializer** - {string|function(Object<string,string>):string} - A function used to prepare string representation
-	     *      of request parameters (specified as an object).
-	     *      Is specified as string, it is interpreted as function registered in with the {$injector}.
+	     *      Overriding the Default TransformationjqLiks}
+	     *    - **paramSerializer** - `{string|function(Object<string,string>):string}` - A function used to
+	     *      prepare the string representation of request parameters (specified as an object).
+	     *      If specified as string, it is interpreted as function registered with the
+	     *      {@link $injector $injector}, which means you can create your own serializer
+	     *      by registering it as a {@link auto.$provide#service service}.
+	     *      The default serializer is the {@link $httpParamSerializer $httpParamSerializer};
+	     *      alternatively, you can use the {@link $httpParamSerializerJQLike $httpParamSerializerJQLike}
 	     *    - **cache** – `{boolean|Cache}` – If true, a default $http cache will be used to cache the
 	     *      GET request, otherwise if a cache instance built with
 	     *      {@link ng.$cacheFactory $cacheFactory}, this cache will be used for
@@ -25594,8 +25663,10 @@
 	              nameId.name = ast.property.name;
 	            }
 	          }
-	          recursionFn(intoId);
+	        }, function() {
+	          self.assign(intoId, 'undefined');
 	        });
+	        recursionFn(intoId);
 	      }, !!create);
 	      break;
 	    case AST.CallExpression:
@@ -25633,8 +25704,10 @@
 	            }
 	            expression = self.ensureSafeObject(expression);
 	            self.assign(intoId, expression);
-	            recursionFn(intoId);
+	          }, function() {
+	            self.assign(intoId, 'undefined');
 	          });
+	          recursionFn(intoId);
 	        });
 	      }
 	      break;
@@ -27017,6 +27090,19 @@
 
 	  /**
 	   * @ngdoc method
+	   * @name $q#resolve
+	   * @kind function
+	   *
+	   * @description
+	   * Alias of {@link ng.$q#when when} to maintain naming consistency with ES6.
+	   *
+	   * @param {*} value Value or a promise
+	   * @returns {Promise} Returns a promise of the passed value or promise
+	   */
+	  var resolve = when;
+
+	  /**
+	   * @ngdoc method
 	   * @name $q#all
 	   * @kind function
 	   *
@@ -27083,6 +27169,7 @@
 	  $Q.defer = defer;
 	  $Q.reject = reject;
 	  $Q.when = when;
+	  $Q.resolve = resolve;
 	  $Q.all = all;
 
 	  return $Q;
@@ -30392,9 +30479,11 @@
 	 *     `{name: {first: 'John', last: 'Doe'}}` will **not** be matched by `{name: 'John'}`, but
 	 *     **will** be matched by `{$: 'John'}`.
 	 *
-	 *   - `function(value, index)`: A predicate function can be used to write arbitrary filters. The
-	 *     function is called for each element of `array`. The final result is an array of those
-	 *     elements that the predicate returned true for.
+	 *   - `function(value, index, array)`: A predicate function can be used to write arbitrary filters.
+	 *     The function is called for each element of the array, with the element, its index, and
+	 *     the entire array itself as arguments.
+	 *
+	 *     The final result is an array of those elements that the predicate returned true for.
 	 *
 	 * @param {function(actual, expected)|true|undefined} comparator Comparator which is used in
 	 *     determining if the expected value (from the filter expression) and actual value (from
@@ -30695,9 +30784,10 @@
 	 * @description
 	 * Formats a number as text.
 	 *
+	 * If the input is null or undefined, it will just be returned.
+	 * If the input is infinite (Infinity/-Infinity) the Infinity symbol '∞' is returned.
 	 * If the input is not a number an empty string is returned.
 	 *
-	 * If the input is an infinite (Infinity/-Infinity) the Infinity symbol '∞' is returned.
 	 *
 	 * @param {number|string} number Number to format.
 	 * @param {(number|string)=} fractionSize Number of decimal places to round the number to.
@@ -31326,7 +31416,7 @@
 	 * @description
 	 * Orders a specified `array` by the `expression` predicate. It is ordered alphabetically
 	 * for strings and numerically for numbers. Note: if you notice numbers are not being sorted
-	 * correctly, make sure they are actually being saved as numbers and not strings.
+	 * as expected, make sure they are actually being saved as numbers and not strings.
 	 *
 	 * @param {Array} array The array to sort.
 	 * @param {function(*)|string|Array.<(function(*)|string)>=} expression A predicate to be
@@ -31401,19 +31491,40 @@
 	                  {name:'Mike', phone:'555-4321', age:21},
 	                  {name:'Adam', phone:'555-5678', age:35},
 	                  {name:'Julie', phone:'555-8765', age:29}];
-	             $scope.predicate = '-age';
+	             $scope.predicate = 'age';
+	             $scope.reverse = true;
+	             $scope.order = function(predicate) {
+	               $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
+	               $scope.predicate = predicate;
+	             };
 	           }]);
 	       </script>
+	       <style type="text/css">
+	         .sortorder:after {
+	           content: '\25b2';
+	         }
+	         .sortorder.reverse:after {
+	           content: '\25bc';
+	         }
+	       </style>
 	       <div ng-controller="ExampleController">
 	         <pre>Sorting predicate = {{predicate}}; reverse = {{reverse}}</pre>
 	         <hr/>
 	         [ <a href="" ng-click="predicate=''">unsorted</a> ]
 	         <table class="friend">
 	           <tr>
-	             <th><a href="" ng-click="predicate = 'name'; reverse=false">Name</a>
-	                 (<a href="" ng-click="predicate = '-name'; reverse=false">^</a>)</th>
-	             <th><a href="" ng-click="predicate = 'phone'; reverse=!reverse">Phone Number</a></th>
-	             <th><a href="" ng-click="predicate = 'age'; reverse=!reverse">Age</a></th>
+	             <th>
+	               <a href="" ng-click="order('name')">Name</a>
+	               <span class="sortorder" ng-show="predicate === 'name'" ng-class="{reverse:reverse}"></span>
+	             </th>
+	             <th>
+	               <a href="" ng-click="order('phone')">Phone Number</a>
+	               <span class="sortorder" ng-show="predicate === 'phone'" ng-class="{reverse:reverse}"></span>
+	             </th>
+	             <th>
+	               <a href="" ng-click="order('age')">Age</a>
+	               <span class="sortorder" ng-show="predicate === 'age'" ng-class="{reverse:reverse}"></span>
+	             </th>
 	           </tr>
 	           <tr ng-repeat="friend in friends | orderBy:predicate:reverse">
 	             <td>{{friend.name}}</td>
@@ -32576,7 +32687,7 @@
 	var ISO_DATE_REGEXP = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
 	var URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
 	var EMAIL_REGEXP = /^[a-z0-9!#$%&'*+\/=?^_`{|}~.-]+@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/i;
-	var NUMBER_REGEXP = /^\s*(\-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
+	var NUMBER_REGEXP = /^\s*(\-|\+)?(\d+|(\d*(\.\d*)))([eE][+-]?\d+)?\s*$/;
 	var DATE_REGEXP = /^(\d{4})-(\d{2})-(\d{2})$/;
 	var DATETIMELOCAL_REGEXP = /^(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d)(?::(\d\d)(\.\d{1,3})?)?$/;
 	var WEEK_REGEXP = /^(\d{4})-W(\d\d)$/;
@@ -33174,6 +33285,16 @@
 	   * Be aware that a string containing a number is not enough. See the {@link ngModel:numfmt}
 	   * error docs for more information and an example of how to convert your model if necessary.
 	   * </div>
+	   *
+	   * ## Issues with HTML5 constraint validation
+	   *
+	   * In browsers that follow the
+	   * [HTML5 specification](https://html.spec.whatwg.org/multipage/forms.html#number-state-%28type=number%29),
+	   * `input[number]` does not work as expected with {@link ngModelOptions `ngModelOptions.allowInvalid`}.
+	   * If a non-number is entered in the input, the browser will report the value as an empty string,
+	   * which means the view / model values in `ngModel` and subsequently the scope value
+	   * will also be an empty string.
+	   *
 	   *
 	   * @param {string} ngModel Assignable angular expression to data-bind to.
 	   * @param {string=} name Property name of the form under which the control is published.
@@ -34711,7 +34832,7 @@
 	 * @example Example that demonstrates basic bindings via ngClass directive.
 	   <example>
 	     <file name="index.html">
-	       <p ng-class="{strike: deleted, bold: important, red: error}">Map Syntax Example</p>
+	       <p ng-class="{strike: deleted, bold: important, 'has-error': error}">Map Syntax Example</p>
 	       <label>
 	          <input type="checkbox" ng-model="deleted">
 	          deleted (apply "strike" class)
@@ -34722,7 +34843,7 @@
 	       </label><br>
 	       <label>
 	          <input type="checkbox" ng-model="error">
-	          error (apply "red" class)
+	          error (apply "has-error" class)
 	       </label>
 	       <hr>
 	       <p ng-class="style">Using String Syntax</p>
@@ -34751,6 +34872,10 @@
 	       .red {
 	           color: red;
 	       }
+	       .has-error {
+	           color: red;
+	           background-color: yellow;
+	       }
 	       .orange {
 	           color: orange;
 	       }
@@ -34761,13 +34886,13 @@
 	       it('should let you toggle the class', function() {
 
 	         expect(ps.first().getAttribute('class')).not.toMatch(/bold/);
-	         expect(ps.first().getAttribute('class')).not.toMatch(/red/);
+	         expect(ps.first().getAttribute('class')).not.toMatch(/has-error/);
 
 	         element(by.model('important')).click();
 	         expect(ps.first().getAttribute('class')).toMatch(/bold/);
 
 	         element(by.model('error')).click();
-	         expect(ps.first().getAttribute('class')).toMatch(/red/);
+	         expect(ps.first().getAttribute('class')).toMatch(/has-error/);
 	       });
 
 	       it('should let you toggle string example', function() {
@@ -37601,7 +37726,7 @@
 	 *   - `debounce`: integer value which contains the debounce model update value in milliseconds. A
 	 *     value of 0 triggers an immediate update. If an object is supplied instead, you can specify a
 	 *     custom value for each event. For example:
-	 *     `ng-model-options="{ updateOn: 'default blur', debounce: {'default': 500, 'blur': 0} }"`
+	 *     `ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 500, 'blur': 0 } }"`
 	 *   - `allowInvalid`: boolean value which indicates that the model can be set with values that did
 	 *     not validate correctly instead of the default behavior of setting the model to undefined.
 	 *   - `getterSetter`: boolean value which determines whether or not to treat functions bound to
@@ -37851,7 +37976,9 @@
 	function isObjectEmpty(obj) {
 	  if (obj) {
 	    for (var prop in obj) {
-	      return false;
+	      if (obj.hasOwnProperty(prop)) {
+	        return false;
+	      }
 	    }
 	  }
 	  return true;
@@ -38194,6 +38321,7 @@
 	        values = values || [];
 
 	        Object.keys(values).forEach(function getWatchable(key) {
+	          if (key.charAt(0) === '$') return;
 	          var locals = getLocals(values[key], key);
 	          var selectValue = getTrackByValueFn(values[key], locals);
 	          watchedArray.push(selectValue);
@@ -38597,8 +38725,7 @@
 	        // Check to see if the value has changed due to the update to the options
 	        if (!ngModelCtrl.$isEmpty(previousValue)) {
 	          var nextValue = selectCtrl.readValue();
-	          if (ngOptions.trackBy && !equals(previousValue, nextValue) ||
-	                previousValue !== nextValue) {
+	          if (ngOptions.trackBy ? !equals(previousValue, nextValue) : previousValue !== nextValue) {
 	            ngModelCtrl.$setViewValue(nextValue);
 	            ngModelCtrl.$render();
 	          }
@@ -38946,6 +39073,15 @@
 	 *    </div>
 	 * ```
 	 *
+	 * <div class="alert alert-warning">
+	 * **Note:** `track by` must always be the last expression:
+	 * </div>
+	 * ```
+	 * <div ng-repeat="model in collection | orderBy: 'id' as filtered_result track by model.id">
+	 *     {{model.name}}
+	 * </div>
+	 * ```
+	 *
 	 * # Special repeat start and end points
 	 * To repeat a series of elements instead of just one parent element, ngRepeat (as well as other ng directives) supports extending
 	 * the range of the repeater by defining explicit start and end points by using **ng-repeat-start** and **ng-repeat-end** respectively.
@@ -39017,8 +39153,9 @@
 	 *     which can be used to associate the objects in the collection with the DOM elements. If no tracking expression
 	 *     is specified, ng-repeat associates elements by identity. It is an error to have
 	 *     more than one tracking expression value resolve to the same key. (This would mean that two distinct objects are
-	 *     mapped to the same DOM element, which is not possible.)  If filters are used in the expression, they should be
-	 *     applied before the tracking expression.
+	 *     mapped to the same DOM element, which is not possible.)
+	 *
+	 *     Note that the tracking expression must come last, after any filters, and the alias expression.
 	 *
 	 *     For example: `item in items` is equivalent to `item in items track by $id(item)`. This implies that the DOM elements
 	 *     will be associated by item identity in the array.
@@ -40514,7 +40651,7 @@
 	!window.angular.$$csp() && window.angular.element(document).find('head').prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
 
 /***/ },
-/* 8 */
+/* 6 */
 /***/ function(module, exports) {
 
 	/**
@@ -41875,13 +42012,13 @@
 
 
 /***/ },
-/* 9 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = [function FrontPageDirective(){
 		return {
 	    scope:{},
-			template:__webpack_require__(10),
+			template:__webpack_require__(8),
 	    controllerAs:'frontPageCtrl',
 	    bindToController:true,
 			controller:[function(){
@@ -41892,19 +42029,19 @@
 
 
 /***/ },
-/* 10 */
+/* 8 */
 /***/ function(module, exports) {
 
-	module.exports = "<div>\n  <user-dash></user-dash>\n  <div class=\"col-xs-8\">\n  <postlist></postlist>\n  </div>\n  <div class=\"col-xs-4\">\n    <sign-up></sign-up>\n    <create-post></create-post>\n  </div>\n</div>\n";
+	module.exports = "<div>\r\n  <user-dash></user-dash>\r\n  <div class=\"col-xs-8\">\r\n  <postlist></postlist>\r\n  </div>\r\n  <div class=\"col-xs-4\">\r\n    <sign-up></sign-up>\r\n    <create-post></create-post>\r\n  </div>\r\n</div>\r\n";
 
 /***/ },
-/* 11 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(){
 	  return {
 	    scope:{},
-	    template:__webpack_require__(12),
+	    template:__webpack_require__(10),
 	    restrict:'E',
 	    bindToController:true,
 	    controllerAs:'signupCtrl',
@@ -41926,13 +42063,13 @@
 
 
 /***/ },
-/* 12 */
+/* 10 */
 /***/ function(module, exports) {
 
-	module.exports = "<div ng-show=\"!signupCtrl.signedIn\" class=\"signup_form  outline\">\n  <h1>Sign up</h1>\n  <form >\n    <input type=\"text\" ng-model=\"signupCtrl.form.username\"/>\n    <input ng-click=\"signupCtrl.signup()\" class=\"btn btn-primary\" type=\"submit\" placeholder=\"Sign up!\"/>\n  </form>\n</div>\n";
+	module.exports = "<div ng-show=\"!signupCtrl.signedIn\" class=\"signup_form  outline\">\r\n  <h1>Sign up</h1>\r\n  <form >\r\n    <input type=\"text\" ng-model=\"signupCtrl.form.username\"/>\r\n    <input ng-click=\"signupCtrl.signup()\" class=\"btn btn-primary\" type=\"submit\" placeholder=\"Sign up!\"/>\r\n  </form>\r\n</div>\r\n";
 
 /***/ },
-/* 13 */
+/* 11 */
 /***/ function(module, exports) {
 
 	module.exports = [function(){
@@ -41944,13 +42081,13 @@
 
 
 /***/ },
-/* 14 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = [function(){
 	  return {
 	    scope:{},
-	    template:__webpack_require__(15),
+	    template:__webpack_require__(13),
 	    bindToController:true,
 	    controllerAs:'userdashCtrl',
 	    controller:['$rootScope','user',function ($rootScope,user) {
@@ -41966,13 +42103,13 @@
 
 
 /***/ },
-/* 15 */
+/* 13 */
 /***/ function(module, exports) {
 
-	module.exports = "<div>\n  {{userdashCtrl.username}}\n</div>\n";
+	module.exports = "<div>\r\n  {{userdashCtrl.username}}\r\n</div>\r\n";
 
 /***/ },
-/* 16 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -41985,7 +42122,7 @@
 	      posttitle:'=',
 	      postcontents:'=',
 	    },
-	    template:__webpack_require__(17),
+	    template:__webpack_require__(15),
 	    controllerAs:'postCtrl',
 	    bindToController:true,
 	    controller:['io','postService',function(io,postService){
@@ -41995,6 +42132,7 @@
 
 	      function init(){
 	        postService.setCurrentPost(vm.postid);
+	        postService.subscribeToCurrentPost();
 	      }
 	    }]
 	  };
@@ -42002,19 +42140,19 @@
 
 
 /***/ },
-/* 17 */
+/* 15 */
 /***/ function(module, exports) {
 
-	module.exports = "<div>\n  <div class=\"outline post_main_section\">\n    <h3>{{postCtrl.posttitle}}</h3>\n    <div class=\"outline post_contents_section\">\n      <p>{{postCtrl.postcontents}}</p>\n    </div>\n  </div>\n  <comment-list data=\"comment\" ></comment-list>\n</div>\n";
+	module.exports = "<div>\r\n  <div class=\"outline post_main_section\">\r\n    <h3>{{postCtrl.posttitle}}</h3>\r\n    <div class=\"outline post_contents_section\">\r\n      <p>{{postCtrl.postcontents}}</p>\r\n    </div>\r\n  </div>\r\n  <comment-list data=\"comment\" ></comment-list>\r\n</div>\r\n";
 
 /***/ },
-/* 18 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = [function(){
 	  return {
 	    scope:{},
-	    template:__webpack_require__(19),
+	    template:__webpack_require__(17),
 	    controllerAs:'postListCtrl',
 	    bindToController:true,
 	    controller:['$scope','io',function($scope,io){
@@ -42042,10 +42180,35 @@
 
 
 /***/ },
+/* 17 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"outline postlist\">\r\n  <div>\r\n    <ul>\r\n      <li ng-repeat=\"post in postListCtrl.posts\">\r\n        <p>\r\n          <a ng-href=\"/post/{{post.id}}\">{{post.title}}</a>\r\n        </p>\r\n      </li>\r\n    </ul>\r\n  </div>\r\n</div>\r\n";
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = [function(){
+	  return {
+	    scope:{
+	      post:'='
+	    },
+	    template:__webpack_require__(19),
+	    controllerAs:'postListItem',
+	    bindToController:true,
+	    controller:[function(){
+
+	    }]
+	  };
+	}];
+
+
+/***/ },
 /* 19 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"outline postlist\">\n  <div>\n    <ul>\n      <li ng-repeat=\"post in postListCtrl.posts\">\n        <p>\n          <a ng-href=\"/post/{{post.id}}\">{{post.title}}</a>\n        </p>\n      </li>\n    </ul>\n  </div>\n</div>\n";
+	module.exports = "<p>\r\n  {{postListItem.post.title}}\r\n</p>\r\n";
 
 /***/ },
 /* 20 */
@@ -42090,13 +42253,13 @@
 /* 21 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"col-xs-12 createpost\">\n\n  <button ng-if=\"!createPostCtrl.createMode\"ng-click=\"createPostCtrl.toggleCreateMode()\">\n    Create a post\n  </button>\n\n  <div ng-if=\"createPostCtrl.createMode\">\n    <input ng-model=\"createPostCtrl.form.title\" type=\"text\" name=\"title\" placeholder=\"Title\"/>\n    <textarea ng-model=\"createPostCtrl.form.contents\" class=\"createpost-contents\" name=\"contents\" cols=\"40\" rows=\"10\">A new post</textarea>\n    <div class=\"createpost-buttons pull-right\">\n      <button type=\"button\" ng-click=\"createPostCtrl.create()\" class=\"btn btn-primary\">Create</button>\n      <button type=\"button\" ng-click=\"createPostCtrl.toggleCreateMode()\" class=\"btn btn-danger\">Cancel</button>\n    </div>\n  </div>\n</div>\n";
+	module.exports = "<div class=\"col-xs-12 createpost\">\r\n\r\n  <button ng-if=\"!createPostCtrl.createMode\"ng-click=\"createPostCtrl.toggleCreateMode()\">\r\n    Create a post\r\n  </button>\r\n\r\n  <div ng-if=\"createPostCtrl.createMode\">\r\n    <input ng-model=\"createPostCtrl.form.title\" type=\"text\" name=\"title\" placeholder=\"Title\"/>\r\n    <textarea ng-model=\"createPostCtrl.form.contents\" class=\"createpost-contents\" name=\"contents\" cols=\"40\" rows=\"10\">A new post</textarea>\r\n    <div class=\"createpost-buttons pull-right\">\r\n      <button type=\"button\" ng-click=\"createPostCtrl.create()\" class=\"btn btn-primary\">Create</button>\r\n      <button type=\"button\" ng-click=\"createPostCtrl.toggleCreateMode()\" class=\"btn btn-danger\">Cancel</button>\r\n    </div>\r\n  </div>\r\n</div>\r\n";
 
 /***/ },
 /* 22 */
 /***/ function(module, exports) {
 
-	module.exports = [function(){
+	module.exports = ['io',function(io){
 	  var srvc = this;
 
 	  var currentPost = null;
@@ -42107,6 +42270,15 @@
 	  srvc.getCurrentPost = function(){
 	    return currentPost;
 	  };
+
+	  srvc.subscribeToCurrentPost = function(){
+	  	io.get('/post/'+srvc.getCurrentPost()+'/subscribe',function(response){
+	  		
+	  	});
+	  };
+	  function watchPostMessages(){
+	  	console.log('watching post messages');
+	  }
 	}];
 
 
@@ -42119,15 +42291,13 @@
 	 * */
 	module.exports = [function () {
 	  return {
-	    scope: {
-	      data: '='
-	    },
+	    scope: {},
 	    template: __webpack_require__(24),
 	    controllerAs: 'commentsCtrl',
 	    bindToController: true,
-	    controller: ['$scope','io','postService', function ($scope,io,postService) {
+	    controller: ['$scope','io','commentService', function ($scope,io,commentService) {
 	      var vm = this;
-	      vm.nodes = [];
+	      vm.nodes = commentService.nodes;
 
 	      init();
 
@@ -42135,161 +42305,12 @@
 	        getComments();
 	      }
 
+
+	      
 	      function getComments(){
-	        io
-	          .get('/post/'+postService.getCurrentPost()+'/comment',function(response){
-	            vm.nodes = mapToNodes(response.payload);
-	            $scope.$evalAsync();
-	          });
-	      }
-
-	      function mapToNodes(flatComments) {
-	        var treeMap = {};
-	        var _flat = [];
-	        var _result = [];
-
-	        flatComments.forEach(function(comment){
-	          console.log('loop');
-	          if(comment.parent === null){
-	            treeMap[comment.id] = comment;
-	            _result.push(comment);
-	          }else{
-	            _flat.push(comment);
-	          }
-	          comment.nodes = [];
+	        commentService.getComments().then(function(nodes){
+	          vm.nodes = nodes;
 	        });
-
-	        mapChildren(treeMap,_flat);
-
-
-	        return _result;
-	      }
-
-	      function mapChildren(map,children){
-	        var flat = [];
-	        _.each(children,function(comment){
-	          console.log('loop');
-	          var parent = map[comment.parent];
-	          if(typeof parent !== 'undefined'){
-	            parent.nodes.push(comment);
-	            map[comment.id] = comment;
-	          }else{
-	            flat.push(comment);
-	          }
-	        });
-	        if(flat.length > 0){
-	          mapChildren(map,flat)
-	        }else{
-	          return;
-	        }
-	      }
-
-	      function getFlatComments() {
-	        return [
-	          {
-	            id: 1,
-	            contents: "commend number: 1",
-	            parent: null,
-	            post: 1
-	          },
-	          {
-	            id: 2,
-	            contents: "commend number: 2",
-	            parent: 1,
-	            post: 1
-	          },
-	          {
-	            id: 3,
-	            contents: "commend number: 3",
-	            parent: 1,
-	            post: 1
-	          },
-	          {
-	            id: 4,
-	            contents: "commend number: 4",
-	            parent: 2,
-	            post: 1
-	          },
-	          {
-	            id: 5,
-	            contents: "commend number: 5",
-	            parent: 3,
-	            post: 1
-	          },
-	          {
-	            id: 6,
-	            contents: "commend number: 6",
-	            parent: 2,
-	            post: 1
-	          },
-	          {
-	            id: 7,
-	            contents: "commend number: 7",
-	            parent: 5,
-	            post: 1
-	          },
-	          {
-	            id: 8,
-	            contents: "commend number: 8",
-	            parent: 4,
-	            post: 1
-	          },
-	          {
-	            id: 9,
-	            contents: "commend number: 9",
-	            parent: 3,
-	            post: 1
-	          },
-	          {
-	            id: 10,
-	            contents: "commend number: 10",
-	            parent: 3,
-	            post: 1
-	          },
-	          {
-	           id:20,
-	            contents:"comment number: 20",
-	            parent:null,
-	            post:1
-	          },{
-	           id:21,
-	            contents:"comment number: 20",
-	            parent:20,
-	            post:1
-	          },{
-	           id:22,
-	            contents:"comment number: 20",
-	            parent:21,
-	            post:1
-	          },{
-	           id:23,
-	            contents:"comment number: 20",
-	            parent:22,
-	            post:1
-	          },{
-	           id:24,
-	            contents:"comment number: 20",
-	            parent:23,
-	            post:1
-	          },{
-	           id:25,
-	            contents:"comment number: 20",
-	            parent:24,
-	            post:1
-	          },{
-	           id:26,
-	            contents:"comment number: 20",
-	            parent:25,
-	            post:1
-	          },{
-	           id:27,
-	            contents:"comment number: 20",
-	            parent:26,
-	            post:1
-	          },
-
-
-	        ];
 	      }
 
 	    }]
@@ -42301,7 +42322,7 @@
 /* 24 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"outline comments\">\n\n  <create-comment-box></create-comment-box>\n\n  <script type=\"text/ng-template\" id=\"nodes_renderer.html\">\n    <comment data=\"node\"></comment>\n    <ol ui-tree-nodes=\"\" ng-model=\"node.nodes\">\n      <li ng-repeat=\"node in node.nodes\" ui-tree-node ng-include=\"'nodes_renderer.html'\">\n      </li>\n    </ol>\n  </script>\n  <div ui-tree data-drag-enabled=\"false\">\n    <ol ui-tree-nodes=\"\" ng-model=\"commentsCtrl.nodes\" id=\"tree-root\">\n      <li ng-repeat=\"node in commentsCtrl.nodes\" ui-tree-node ng-include=\"'nodes_renderer.html'\"></li>\n    </ol>\n  </div>\n</div>\n";
+	module.exports = "<div class=\"outline comments\">\r\n\r\n  <create-comment-box></create-comment-box>\r\n\r\n  <script type=\"text/ng-template\" id=\"nodes_renderer.html\">\r\n    <comment data=\"node\"></comment>\r\n    <ol ui-tree-nodes=\"\" ng-model=\"node.nodes\">\r\n      <li ng-repeat=\"node in node.nodes\" ui-tree-node ng-include=\"'nodes_renderer.html'\">\r\n      </li>\r\n    </ol>\r\n  </script>\r\n  <div ui-tree data-drag-enabled=\"false\">\r\n    <ol ui-tree-nodes=\"\" ng-model=\"commentsCtrl.nodes\" id=\"tree-root\">\r\n      <li ng-repeat=\"node in commentsCtrl.nodes\" ui-tree-node ng-include=\"'nodes_renderer.html'\"></li>\r\n    </ol>\r\n  </div>\r\n</div>\r\n";
 
 /***/ },
 /* 25 */
@@ -42325,11 +42346,11 @@
 
 
 	      function init(){
-	        vm.reply = false;
+	        vm.data.reply = false;
 	      }
 
 	      function toggleReply(){
-	        vm.reply = !vm.reply;
+	        vm.data.reply = !vm.data.reply;
 	      }
 	    }]
 	  };
@@ -42340,7 +42361,7 @@
 /* 26 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"outline comment\">\n  {{commentCtrl.data.contents}}\n  <div class=\"comment-actionbar\">\n    <a ng-click=\"commentCtrl.toggleReply()\">reply</a>\n    <a href=\"#\">report</a>\n  </div>\n  <div>\n    <div ng-if=\"commentCtrl.reply\">\n      <create-comment-box data=\"commentCtrl.data\"></create-comment-box>\n    </div>\n  </div>\n</div>\n";
+	module.exports = "<div class=\"outline comment\">\r\n  {{commentCtrl.data.contents}}\r\n  <div class=\"comment-actionbar\">\r\n    <a ng-click=\"commentCtrl.toggleReply()\">reply</a>\r\n    <a href=\"#\">report</a>\r\n  </div>\r\n  <div>\r\n    <div ng-if=\"commentCtrl.data.reply\">\r\n      <create-comment-box data=\"commentCtrl.data\"></create-comment-box>\r\n    </div>\r\n  </div>\r\n</div>\r\n";
 
 /***/ },
 /* 27 */
@@ -42354,7 +42375,7 @@
 	    template: __webpack_require__(28),
 	    controllerAs: 'createCtrl',
 	    bindToController: true,
-	    controller: ['io','postService', function (io,postService) {
+	    controller: ['$rootScope','io','postService','commentService', function ($rootScope,io,postService,commentService) {
 	      var vm = this;
 	      vm.submit = submit;
 	      init();
@@ -42369,10 +42390,18 @@
 	      }
 
 	      function submit(){
-	        var url = '/post/'+postService.getCurrentPost()+'/comment';
-	        io.post(url,vm.form,function(response){
-	          debugger;
-	        });
+	        commentService
+	          .createComment(vm.form)
+	          .then(function(){
+	            $rootScope.$evalAsync();
+	          })
+	          .catch(function(errors){
+
+	          })
+	          .finally(function(){
+	            init();
+	            vm.data.reply = false;
+	          });
 	      }
 
 	      function getParentCommentId(){
@@ -42388,21 +42417,116 @@
 /* 28 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"create-comment-box\">\n  <textarea ng-model=\"createCtrl.form.contents\"></textarea>\n  <button ng-click=\"createCtrl.submit()\">comment</button>\n</div>\n";
+	module.exports = "<div class=\"create-comment-box\">\r\n  <textarea ng-model=\"createCtrl.form.contents\"></textarea>\r\n  <button ng-click=\"createCtrl.submit()\">comment</button>\r\n</div>\r\n";
 
 /***/ },
 /* 29 */
+/***/ function(module, exports) {
+
+	module.exports = ['$rootScope','$q','io','postService',function($rootScope,$q,io,postService){
+	  var srvc = this;
+	  var map = {};
+
+	  srvc.nodes = [];
+
+	  srvc.createComment = createComment;
+	  srvc.getComments = getComments;
+	  srvc.getNodes = getNodes;
+
+
+	  
+
+	  function getNodes(){
+	  	return srvc.nodes;
+	  };
+
+	  function createComment(comment){
+	  	var url = '/post/'+postService.getCurrentPost()+'/comment';
+	  	return $q(function(res,rej){
+		    io.post(url,comment,function(response){
+		    	if(response.hasErrors){
+		    		rej(response.errors);
+		    	}
+		    	receiveComments(response.payload);
+		    	res();
+		    });
+	  	});
+	  }
+
+	  function getComments(){
+	  	return $q(function(res,rej){
+	  	 io
+	      .get('/post/'+postService.getCurrentPost()+'/comment',function(response){
+	      	if(!response.payload) rej();
+	       	tree(response.payload);
+	       	watchPostComments();
+	       	res(srvc.nodes);
+	      });
+	  	});
+	  }
+
+	  function tree(flatArray){
+	    //find all the parents
+	    for(var i=flatArray.length-1; i >= 0;i--){
+	      var el = flatArray[i];
+	      el.nodes = [];
+	      if(el.parent === null){
+	        map[el.id] = el;
+	        srvc.nodes.push(el);
+	        flatArray.splice(i,1);
+	      }else if(map[el.parent]){
+	        //if a previous iteration added this element's parent to the map, add it as a child now
+	        addToParentAndMap(el);
+	        flatArray.splice(i,1);
+	      }
+	    }
+	    //continuously pop the front element off the array and try to find its parent in the map
+	    //if the parent's not there, it's further forward in the array so just push the el to the back and try again later
+	    while(flatArray.length > 0){
+	      var el = flatArray.shift();
+	      if(map[el.parent]){
+	        addToParentAndMap(el);
+	      }else{
+	        flatArray.push(el);
+	      }
+	    }
+	  }
+	  
+	  function addToParentAndMap(el){
+	    map[el.parent].nodes.push(el);
+	    map[el.id] = el;
+	  }
+
+	  function receiveComments(comments){
+	  	var _comments = typeof comments.length !== 'undefined' ? comments : [comments];
+	  	tree(_comments);
+	  }
+
+	  function watchPostComments(){
+	  	io.on('COMMENT:CREATE',function(message){
+	  		receiveComments(message.payload);
+	  		$rootScope.$evalAsync();
+	  	});
+	  }
+
+
+
+	}];
+
+
+/***/ },
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	var io = __webpack_require__(30);
+	var io = __webpack_require__(31);
 	module.exports = [function () {
 	    return io().socket;
 	}];
 
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports) {
 
 	// socket.io-1.2.1

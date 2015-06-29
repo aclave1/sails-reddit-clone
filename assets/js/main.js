@@ -17,6 +17,7 @@ angular
   .directive('commentList',require('./modules/comments/comment-list'))
   .directive('comment',require('./modules/comments/comment'))
   .directive('createCommentBox',require('./modules/comments/create-comment-box'))
+  .service('commentService',require('./modules/comments/commentservice'))
 
   .factory('io',require('./SocketFactory'))
 	;

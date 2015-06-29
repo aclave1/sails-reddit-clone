@@ -18,7 +18,22 @@ module.exports = {
         post: params.post
       })
       .then(function (created) {
-        res.json({payload:created});
+        var postId = created.post;
+        var response = {payload:created};
+        notifyPostRoom(req,postId,response);
+        
+        res.ok(response);
+      })
+      .catch(function(error){
+        res.json({
+          errors:[error],
+          hasErrors:true
+        });
       });
   }
 };
+
+function notifyPostRoom(req,postId,response){
+  var roomName = PostService.getRoomNameFromPostId(postId);
+  sails.sockets.broadcast(roomName,'COMMENT:CREATE',response,req.socket);
+}

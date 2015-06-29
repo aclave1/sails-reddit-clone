@@ -6,7 +6,7 @@ module.exports = [function () {
     template: require('./create-comment-box.html'),
     controllerAs: 'createCtrl',
     bindToController: true,
-    controller: ['io','postService', function (io,postService) {
+    controller: ['$rootScope','io','postService','commentService', function ($rootScope,io,postService,commentService) {
       var vm = this;
       vm.submit = submit;
       init();
@@ -21,10 +21,18 @@ module.exports = [function () {
       }
 
       function submit(){
-        var url = '/post/'+postService.getCurrentPost()+'/comment';
-        io.post(url,vm.form,function(response){
-          debugger;
-        });
+        commentService
+          .createComment(vm.form)
+          .then(function(){
+            $rootScope.$evalAsync();
+          })
+          .catch(function(errors){
+
+          })
+          .finally(function(){
+            init();
+            vm.data.reply = false;
+          });
       }
 
       function getParentCommentId(){
