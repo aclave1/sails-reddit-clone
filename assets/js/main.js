@@ -20,6 +20,34 @@ angular
   .service('commentService',require('./modules/comments/commentservice'))
 
   .factory('io',require('./SocketFactory'))
+  .directive('ngEnter', function () {
+      return function (scope, element, attrs) {
+          element.bind("keydown keypress", function (event) {
+              if(event.which === 13) {
+                  scope.$apply(function (){
+                      scope.$eval(attrs.ngEnter);
+                  });
+   
+                  event.preventDefault();
+              }
+          });
+      };
+  })
+  .directive('focusMe', function($timeout) {
+      return {
+        link: function(scope, element, attrs) {
+          scope.$watch(attrs.focusMe, function(value) {
+            if(value === true) { 
+              console.log('value=',value);
+              //$timeout(function() {
+                element[0].focus();
+                scope[attrs.focusMe] = false;
+              //});
+            }
+          });
+        }
+      };
+    })
 	;
 
 

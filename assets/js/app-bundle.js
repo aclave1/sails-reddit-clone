@@ -66,6 +66,34 @@
 	  .service('commentService',__webpack_require__(29))
 
 	  .factory('io',__webpack_require__(30))
+	  .directive('ngEnter', function () {
+	      return function (scope, element, attrs) {
+	          element.bind("keydown keypress", function (event) {
+	              if(event.which === 13) {
+	                  scope.$apply(function (){
+	                      scope.$eval(attrs.ngEnter);
+	                  });
+	   
+	                  event.preventDefault();
+	              }
+	          });
+	      };
+	  })
+	  .directive('focusMe', function($timeout) {
+	      return {
+	        link: function(scope, element, attrs) {
+	          scope.$watch(attrs.focusMe, function(value) {
+	            if(value === true) { 
+	              console.log('value=',value);
+	              //$timeout(function() {
+	                element[0].focus();
+	                scope[attrs.focusMe] = false;
+	              //});
+	            }
+	          });
+	        }
+	      };
+	    })
 		;
 
 
@@ -42143,7 +42171,7 @@
 /* 15 */
 /***/ function(module, exports) {
 
-	module.exports = "<div>\r\n  <div class=\"outline post_main_section\">\r\n    <h3>{{postCtrl.posttitle}}</h3>\r\n    <div class=\"outline post_contents_section\">\r\n      <p>{{postCtrl.postcontents}}</p>\r\n    </div>\r\n  </div>\r\n  <comment-list data=\"comment\" ></comment-list>\r\n</div>\r\n";
+	module.exports = "<div>\r\n\r\n\t<div class=\"panel panel-default\">\r\n\t\t<div class=\"panel-heading\">\r\n    \t\t<h3 class=\"post-heading\">{{postCtrl.posttitle}}</h3>\r\n\t\t</div>\r\n\t\t<div class=\"panel-body\">\r\n      \t\t<p>{{postCtrl.postcontents}}</p>\r\n\t\t</div>\t\r\n\t</div>\r\n  <comment-list data=\"comment\" ></comment-list>\r\n</div>\r\n";
 
 /***/ },
 /* 16 */
@@ -42190,7 +42218,7 @@
 /* 17 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"outline postlist\">\r\n  <div>\r\n    <ul>\r\n      <li ng-repeat=\"post in postListCtrl.posts\">\r\n        <p>\r\n          <a ng-href=\"/post/{{post.id}}\">{{post.title}}</a>\r\n        </p>\r\n      </li>\r\n    </ul>\r\n  </div>\r\n</div>\r\n";
+	module.exports = "<div class=\"postlist\">\r\n  <div>\r\n    <ul class=\"list-group\">\r\n      <li class=\"list-group-item postlist-item\" ng-repeat=\"post in postListCtrl.posts\">\r\n      <img class=\"post-img\" src=\"/img/reddit-alien.png\" alt=\"\">\r\n        <span class=\"title\">\r\n          <a ng-href=\"/post/{{post.id}}\">{{post.title}}</a>\r\n        </span>\r\n      </li>\r\n    </ul>\r\n  </div>\r\n</div>\r\n";
 
 /***/ },
 /* 18 */
@@ -42329,7 +42357,7 @@
 /* 24 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"outline comments\">\r\n\r\n  <create-comment-box></create-comment-box>\r\n\r\n  <script type=\"text/ng-template\" id=\"nodes_renderer.html\">\r\n    <comment data=\"node\"></comment>\r\n    <ol ui-tree-nodes=\"\" ng-model=\"node.nodes\">\r\n      <li ng-repeat=\"node in node.nodes\" ui-tree-node ng-include=\"'nodes_renderer.html'\">\r\n      </li>\r\n    </ol>\r\n  </script>\r\n  <div ui-tree data-drag-enabled=\"false\">\r\n    <ol ui-tree-nodes=\"\" ng-model=\"commentsCtrl.nodes\" id=\"tree-root\">\r\n      <li ng-repeat=\"node in commentsCtrl.nodes\" ui-tree-node ng-include=\"'nodes_renderer.html'\"></li>\r\n    </ol>\r\n  </div>\r\n</div>\r\n";
+	module.exports = "<div class=\"comments\">\r\n\r\n  <create-comment-box></create-comment-box>\r\n\r\n  <script type=\"text/ng-template\" id=\"nodes_renderer.html\">\r\n    <comment data=\"node\"></comment>\r\n    <ol  class=\"list-group\" ui-tree-nodes=\"\" ng-model=\"node.nodes\">\r\n      <li class=\"list-group-item\" ng-repeat=\"node in node.nodes\" ui-tree-node ng-include=\"'nodes_renderer.html'\">\r\n      </li>\r\n    </ol>\r\n  </script>\r\n  <div ui-tree data-drag-enabled=\"false\">\r\n    <ol class=\"list-group\" ui-tree-nodes=\"\" ng-model=\"commentsCtrl.nodes\" id=\"tree-root\">\r\n      <li class=\"list-group-item\" ng-repeat=\"node in commentsCtrl.nodes\" ui-tree-node ng-include=\"'nodes_renderer.html'\"></li>\r\n    </ol>\r\n  </div>\r\n</div>\r\n";
 
 /***/ },
 /* 25 */
@@ -42368,7 +42396,7 @@
 /* 26 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"outline comment\">\r\n  {{commentCtrl.data.contents}}\r\n  <div class=\"comment-actionbar\">\r\n    <a ng-click=\"commentCtrl.toggleReply()\">reply</a>\r\n    <a href=\"#\">report</a>\r\n  </div>\r\n  <div>\r\n    <div ng-if=\"commentCtrl.data.reply\">\r\n      <create-comment-box data=\"commentCtrl.data\"></create-comment-box>\r\n    </div>\r\n  </div>\r\n</div>\r\n";
+	module.exports = "<div class=\"comment\">\r\n  {{commentCtrl.data.contents}}\r\n  <div class=\"comment-actionbar\">\r\n    <a ng-click=\"commentCtrl.toggleReply()\">reply</a>\r\n    <a href=\"#\">report</a>\r\n  </div>\r\n  <div>\r\n    <div ng-if=\"commentCtrl.data.reply\">\r\n      <create-comment-box data=\"commentCtrl.data\"></create-comment-box>\r\n    </div>\r\n  </div>\r\n</div>\r\n";
 
 /***/ },
 /* 27 */
@@ -42385,30 +42413,33 @@
 	    controller: ['$rootScope','io','postService','commentService', function ($rootScope,io,postService,commentService) {
 	      var vm = this;
 	      vm.submit = submit;
+	      vm.cancel = cancel;
 	      init();
-
-
 
 	      function init(){
 	        vm.form = {
-	          contents:'enter a comment here',
+	          contents:'',
 	          parent:getParentCommentId(),
 	        };
 	      }
 
 	      function submit(){
+	        if(vm.form.contents === '') return;
 	        commentService
 	          .createComment(vm.form)
 	          .then(function(){
 	            $rootScope.$evalAsync();
 	          })
 	          .catch(function(errors){
-
+	              
 	          })
 	          .finally(function(){
 	            init();
 	            vm.data.reply = false;
 	          });
+	      }
+	      function cancel(){
+	        init();
 	      }
 
 	      function getParentCommentId(){
@@ -42424,7 +42455,7 @@
 /* 28 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"create-comment-box\">\r\n  <textarea ng-model=\"createCtrl.form.contents\"></textarea>\r\n  <button ng-click=\"createCtrl.submit()\">comment</button>\r\n</div>\r\n";
+	module.exports = "<div class=\"create-comment-box\">\r\n  <textarea class=\"form-control create-comment-textarea\" focus-me ng-enter=\"createCtrl.submit()\" ng-model=\"createCtrl.form.contents\" placeholder=\"Enter a comment here\">\r\n  </textarea>\r\n  \r\n  <button class=\"btn btn-default\" ng-click=\"createCtrl.submit()\">Submit</button>\r\n  <button class=\"btn btn-danger\" ng-click=\"createCtrl.cancel()\">Cancel</button>\r\n</div>\r\n";
 
 /***/ },
 /* 29 */

@@ -1,10 +1,11 @@
-<div class="outline postlist">
+<div class="postlist">
   <div>
-    <ul>
-      <li ng-repeat="post in postListCtrl.posts">
-        <p>
+    <ul class="list-group">
+      <li class="list-group-item postlist-item" ng-repeat="post in postListCtrl.posts">
+      <img class="post-img" src="/img/reddit-alien.png" alt="">
+        <span class="title">
           <a ng-href="/post/{{post.id}}">{{post.title}}</a>
-        </p>
+        </span>
       </li>
     </ul>
   </div>

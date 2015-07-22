@@ -1,4 +1,7 @@
 <div class="create-comment-box">
-  <textarea ng-model="createCtrl.form.contents"></textarea>
-  <button ng-click="createCtrl.submit()">comment</button>
+  <textarea class="form-control create-comment-textarea" focus-me ng-enter="createCtrl.submit()" ng-model="createCtrl.form.contents" placeholder="Enter a comment here">
+  </textarea>
+  
+  <button class="btn btn-default" ng-click="createCtrl.submit()">Submit</button>
+  <button class="btn btn-danger" ng-click="createCtrl.cancel()">Cancel</button>
 </div>

@@ -9,30 +9,33 @@ module.exports = [function () {
     controller: ['$rootScope','io','postService','commentService', function ($rootScope,io,postService,commentService) {
       var vm = this;
       vm.submit = submit;
+      vm.cancel = cancel;
       init();
-
-
 
       function init(){
         vm.form = {
-          contents:'enter a comment here',
+          contents:'',
           parent:getParentCommentId(),
         };
       }
 
       function submit(){
+        if(vm.form.contents === '') return;
         commentService
           .createComment(vm.form)
           .then(function(){
             $rootScope.$evalAsync();
           })
           .catch(function(errors){
-
+              
           })
           .finally(function(){
             init();
             vm.data.reply = false;
           });
+      }
+      function cancel(){
+        init();
       }
 
       function getParentCommentId(){

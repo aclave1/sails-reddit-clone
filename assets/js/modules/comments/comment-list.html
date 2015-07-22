@@ -1,17 +1,17 @@
-<div class="outline comments">
+<div class="comments">
 
   <create-comment-box></create-comment-box>
 
   <script type="text/ng-template" id="nodes_renderer.html">
     <comment data="node"></comment>
-    <ol ui-tree-nodes="" ng-model="node.nodes">
-      <li ng-repeat="node in node.nodes" ui-tree-node ng-include="'nodes_renderer.html'">
+    <ol  class="list-group" ui-tree-nodes="" ng-model="node.nodes">
+      <li class="list-group-item" ng-repeat="node in node.nodes" ui-tree-node ng-include="'nodes_renderer.html'">
       </li>
     </ol>
   </script>
   <div ui-tree data-drag-enabled="false">
-    <ol ui-tree-nodes="" ng-model="commentsCtrl.nodes" id="tree-root">
-      <li ng-repeat="node in commentsCtrl.nodes" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+    <ol class="list-group" ui-tree-nodes="" ng-model="commentsCtrl.nodes" id="tree-root">
+      <li class="list-group-item" ng-repeat="node in commentsCtrl.nodes" ui-tree-node ng-include="'nodes_renderer.html'"></li>
     </ol>
   </div>
 </div>

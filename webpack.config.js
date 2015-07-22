@@ -38,7 +38,7 @@ module.exports = {
         ]
     },
     devServer: {
-        contentBase: "./tmp/public",
+        contentBase: "./.tmp/public",
         hot: true,
         inline: true
     }
