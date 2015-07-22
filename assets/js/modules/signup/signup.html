@@ -1,7 +1,11 @@
-<div ng-show="!signupCtrl.signedIn" class="signup_form  outline">
-  <h1>Sign up</h1>
-  <form >
-    <input type="text" ng-model="signupCtrl.form.username"/>
-    <input ng-click="signupCtrl.signup()" class="btn btn-primary" type="submit" placeholder="Sign up!"/>
-  </form>
+<div ng-show="!signupCtrl.signedIn" class="signup_form  panel panel-default">
+  <div class="panel-heading">
+  	<h3>Sign up</h3>
+  </div>
+	<div class="panel-body">	
+	  <form class="form-group">
+	    <input class="form-control" type="text" ng-model="signupCtrl.form.username" placeholder="Username" style="margin-bottom:10px;"/>
+	    <input ng-click="signupCtrl.signup()" class="btn btn-default pull-right" type="submit" placeholder="Sign up!"/>
+	  </form>
+	</div>
 </div>

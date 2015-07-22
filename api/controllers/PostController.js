@@ -49,7 +49,6 @@ module.exports = {
     return Post
       .find()
       .then(function(postList){
-
         sails.sockets.join(req.socket,'frontpage');
         res.json({
           payload:postList

@@ -5,13 +5,14 @@ module.exports = function(){
     restrict:'E',
     bindToController:true,
     controllerAs:'signupCtrl',
-    controller:['$rootScope','io','user',function($rootScope,io,user){
+    controller:['$rootScope','$http','io','user',function($rootScope,$http,io,user){
       var vm = this;
       vm.form = {};
       vm.signup = function(){
-        io.post('/user',vm.form,function(response){
-          if(response.username){
-            user.username = response.username;
+        $http.post('/user',vm.form).then(function(response){
+          var data = response.data;
+          if(data.user){
+            user.setUser(data.user);
             vm.signedIn = user.signedIn = true;
             $rootScope.$evalAsync();
           }

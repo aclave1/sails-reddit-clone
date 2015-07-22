@@ -4,13 +4,24 @@ module.exports = [function(){
     template:require('./userdash.html'),
     bindToController:true,
     controllerAs:'userdashCtrl',
-    controller:['$rootScope','user',function ($rootScope,user) {
+    controller:['$rootScope','$http','user',function ($rootScope,$http,user) {
       var vm = this;
+      
+      (function init(){
+         getUser();
+      })();
 
-      $rootScope.$watch(function(){return user.username;},function(val){
-        vm.username = val;
+      $rootScope.$watch(user.getUser,function(_user){
+        vm.user = _user;
       });
 
+
+      function getUser(){
+         $http.get('/user').then(function(response){
+            user.setUser(response.data.user);
+            $rootScope.$evalAsync();
+          });
+      }
     }]
   };
 }];

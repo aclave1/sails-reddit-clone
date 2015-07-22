@@ -2,6 +2,7 @@ module.exports.routes = {
   '/': {
     view: 'home'
   },
+  'get /user':'UserController.get',
   'post /user':'UserController.signUp',
   'post /post':'PostController.create',
   'get /post':'PostController.getAll',

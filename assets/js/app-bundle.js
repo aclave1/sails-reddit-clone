@@ -42046,7 +42046,7 @@
 	module.exports = [function FrontPageDirective(){
 		return {
 		    scope:{},
-				template:__webpack_require__(8),
+			template:__webpack_require__(8),
 		    controllerAs:'frontPageCtrl',
 		    bindToController:true,
 			controller:[function(){
@@ -42073,13 +42073,14 @@
 	    restrict:'E',
 	    bindToController:true,
 	    controllerAs:'signupCtrl',
-	    controller:['$rootScope','io','user',function($rootScope,io,user){
+	    controller:['$rootScope','$http','io','user',function($rootScope,$http,io,user){
 	      var vm = this;
 	      vm.form = {};
 	      vm.signup = function(){
-	        io.post('/user',vm.form,function(response){
-	          if(response.username){
-	            user.username = response.username;
+	        $http.post('/user',vm.form).then(function(response){
+	          var data = response.data;
+	          if(data.user){
+	            user.setUser(data.user);
 	            vm.signedIn = user.signedIn = true;
 	            $rootScope.$evalAsync();
 	          }
@@ -42094,7 +42095,7 @@
 /* 10 */
 /***/ function(module, exports) {
 
-	module.exports = "<div ng-show=\"!signupCtrl.signedIn\" class=\"signup_form  outline\">\r\n  <h1>Sign up</h1>\r\n  <form >\r\n    <input type=\"text\" ng-model=\"signupCtrl.form.username\"/>\r\n    <input ng-click=\"signupCtrl.signup()\" class=\"btn btn-primary\" type=\"submit\" placeholder=\"Sign up!\"/>\r\n  </form>\r\n</div>\r\n";
+	module.exports = "<div ng-show=\"!signupCtrl.signedIn\" class=\"signup_form  panel panel-default\">\r\n  <div class=\"panel-heading\">\r\n  \t<h3>Sign up</h3>\r\n  </div>\r\n\t<div class=\"panel-body\">\t\r\n\t  <form class=\"form-group\">\r\n\t    <input class=\"form-control\" type=\"text\" ng-model=\"signupCtrl.form.username\" placeholder=\"Username\" style=\"margin-bottom:10px;\"/>\r\n\t    <input ng-click=\"signupCtrl.signup()\" class=\"btn btn-default pull-right\" type=\"submit\" placeholder=\"Sign up!\"/>\r\n\t  </form>\r\n\t</div>\r\n</div>\r\n";
 
 /***/ },
 /* 11 */
@@ -42102,7 +42103,15 @@
 
 	module.exports = [function(){
 	  function Service(){
-	    this.username = "anonymous";
+	  	var user = {
+	  		userName:"Anon"
+	  	};
+	  	this.setUser = function(_user){
+	  		user = _user;
+	  	};
+	  	this.getUser = function(){
+	  		return user
+	  	};
 	  }
 	  return new Service();
 	}];
@@ -42118,13 +42127,24 @@
 	    template:__webpack_require__(13),
 	    bindToController:true,
 	    controllerAs:'userdashCtrl',
-	    controller:['$rootScope','user',function ($rootScope,user) {
+	    controller:['$rootScope','$http','user',function ($rootScope,$http,user) {
 	      var vm = this;
+	      
+	      (function init(){
+	         getUser();
+	      })();
 
-	      $rootScope.$watch(function(){return user.username;},function(val){
-	        vm.username = val;
+	      $rootScope.$watch(user.getUser,function(_user){
+	        vm.user = _user;
 	      });
 
+
+	      function getUser(){
+	         $http.get('/user').then(function(response){
+	            user.setUser(response.data.user);
+	            $rootScope.$evalAsync();
+	          });
+	      }
 	    }]
 	  };
 	}];
@@ -42134,7 +42154,7 @@
 /* 13 */
 /***/ function(module, exports) {
 
-	module.exports = "<div>\r\n  {{userdashCtrl.username}}\r\n</div>\r\n";
+	module.exports = "<div>\r\n  {{userdashCtrl.user.userName}}\r\n</div>\r\n";
 
 /***/ },
 /* 14 */
@@ -42218,7 +42238,7 @@
 /* 17 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"postlist\">\r\n  <div>\r\n    <ul class=\"list-group\">\r\n      <li class=\"list-group-item postlist-item\" ng-repeat=\"post in postListCtrl.posts\">\r\n      <img class=\"post-img\" src=\"/img/reddit-alien.png\" alt=\"\">\r\n        <span class=\"title\">\r\n          <a ng-href=\"/post/{{post.id}}\">{{post.title}}</a>\r\n        </span>\r\n      </li>\r\n    </ul>\r\n  </div>\r\n</div>\r\n";
+	module.exports = "<div class=\"postlist\">\r\n  <div>\r\n    <ul class=\"list-group\">\r\n      <li class=\"list-group-item postlist-item\" ng-repeat=\"post in postListCtrl.posts\">\r\n      <img class=\"post-img\" src=\"/img/reddit-alien.png\" alt=\"\">\r\n        <span class=\"title\">\r\n          <a ng-href=\"/post/{{post.id}}\">{{post.title}}</a>\r\n        </span>\r\n      </li>\r\n    </ul>\r\n  </div>\r\n</div>";
 
 /***/ },
 /* 18 */
@@ -42288,7 +42308,7 @@
 /* 21 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"col-xs-12 createpost\">\r\n\r\n  <button ng-if=\"!createPostCtrl.createMode\"ng-click=\"createPostCtrl.toggleCreateMode()\">\r\n    Create a post\r\n  </button>\r\n\r\n  <div ng-if=\"createPostCtrl.createMode\">\r\n    <input ng-model=\"createPostCtrl.form.title\" type=\"text\" name=\"title\" placeholder=\"Title\"/>\r\n    <textarea ng-model=\"createPostCtrl.form.contents\" class=\"createpost-contents\" name=\"contents\" cols=\"40\" rows=\"10\">A new post</textarea>\r\n    <div class=\"createpost-buttons pull-right\">\r\n      <button type=\"button\" ng-click=\"createPostCtrl.create()\" class=\"btn btn-primary\">Create</button>\r\n      <button type=\"button\" ng-click=\"createPostCtrl.toggleCreateMode()\" class=\"btn btn-danger\">Cancel</button>\r\n    </div>\r\n  </div>\r\n</div>\r\n";
+	module.exports = "<div>\r\n  <button class=\"btn btn-primary\" ng-if=\"!createPostCtrl.createMode\"ng-click=\"createPostCtrl.toggleCreateMode()\">\r\n    Create a post\r\n  </button>\r\n  <div ng-if=\"createPostCtrl.createMode\" class=\"panel panel-default\">\r\n    <div class=\"panel-heading\">\r\n      <h4>Create a post</h4>\r\n      <input class=\"form-control\" ng-model=\"createPostCtrl.form.title\" type=\"text\" name=\"title\" placeholder=\"Title\"/>\r\n    </div>\r\n    <div class=\"panel-body\">\r\n      <textarea ng-model=\"createPostCtrl.form.contents\" class=\"createpost-contents form-control\" name=\"contents\" cols=\"40\" rows=\"10\">A new post</textarea>\r\n      <div class=\"createpost-buttons pull-right\">\r\n        <button type=\"button\" ng-click=\"createPostCtrl.create()\" class=\"btn btn-default\">Create</button>\r\n        <button type=\"button\" ng-click=\"createPostCtrl.toggleCreateMode()\" class=\"btn btn-danger\">Cancel</button>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</div>";
 
 /***/ },
 /* 22 */
@@ -42396,7 +42416,7 @@
 /* 26 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"comment\">\r\n  {{commentCtrl.data.contents}}\r\n  <div class=\"comment-actionbar\">\r\n    <a ng-click=\"commentCtrl.toggleReply()\">reply</a>\r\n    <a href=\"#\">report</a>\r\n  </div>\r\n  <div>\r\n    <div ng-if=\"commentCtrl.data.reply\">\r\n      <create-comment-box data=\"commentCtrl.data\"></create-comment-box>\r\n    </div>\r\n  </div>\r\n</div>\r\n";
+	module.exports = "<div class=\"comment\">\r\n  <div class=\"comment-username\">{{commentCtrl.data.userName}}</div>\r\n  {{commentCtrl.data.contents}}\r\n  <div class=\"comment-actionbar\">\r\n    <a ng-click=\"commentCtrl.toggleReply()\">reply</a>\r\n    <a href=\"#\">report</a>\r\n  </div>\r\n  <div>\r\n    <div ng-if=\"commentCtrl.data.reply\">\r\n      <create-comment-box data=\"commentCtrl.data\"></create-comment-box>\r\n    </div>\r\n  </div>\r\n</div>\r\n";
 
 /***/ },
 /* 27 */
@@ -42455,7 +42475,7 @@
 /* 28 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"create-comment-box\">\r\n  <textarea class=\"form-control create-comment-textarea\" focus-me ng-enter=\"createCtrl.submit()\" ng-model=\"createCtrl.form.contents\" placeholder=\"Enter a comment here\">\r\n  </textarea>\r\n  \r\n  <button class=\"btn btn-default\" ng-click=\"createCtrl.submit()\">Submit</button>\r\n  <button class=\"btn btn-danger\" ng-click=\"createCtrl.cancel()\">Cancel</button>\r\n</div>\r\n";
+	module.exports = "<div class=\"create-comment-box\">\r\n  <textarea class=\"form-control create-comment-textarea\" focus-me ng-enter=\"createCtrl.submit()\" ng-model=\"createCtrl.form.contents\" placeholder=\"Enter a comment here\">\r\n  </textarea>  \r\n  <button class=\"btn btn-default\" ng-click=\"createCtrl.submit()\">Submit</button>\r\n</div>\r\n";
 
 /***/ },
 /* 29 */
