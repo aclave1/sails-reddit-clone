@@ -5,12 +5,28 @@ module.exports = {
     //create response: {payload:createdPost}
     //notify frontpage room with
     //send json back to client
+    var params = req.params.all();
+    if (!(params.title && params.contents))return res.json({error: 'invalid submission'});
+
+    return Post
+      .create({
+        title: params.title,
+        contents: params.contents,
+      })
+      .then(function (createdPost) {
+        var message = {
+          payload:createdPost
+        };
+        notifyFrontPageRoom(req,message);
+        res.json(message);
+      });
   },
   viewPost: function (req, res) {
     //extract id from params
     //find one post by id
     //if no post, res.view('404')
     //res.view('post',foundPost)
+    res.json({error:"We can't view posts yet!"});
   },
   getAll:function(req,res){
     //find all posts
