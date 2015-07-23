@@ -21,7 +21,7 @@ module.exports = [function(){
 
       function create(){
         io.post('/post',vm.form,function(response){
-          window.location.href = response.link;
+          window.location.href = '/post/'+response.payload.id;
         });
       }
 

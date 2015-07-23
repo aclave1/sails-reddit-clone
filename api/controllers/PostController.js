@@ -14,7 +14,7 @@ module.exports = {
           payload:createdPost
         };
         notifyFrontPageRoom(req,message);
-        res.json({link:"/post/"+createdPost.id});
+        res.json(message);
       });
   },
   viewPost: function (req, res) {
