@@ -26,7 +26,15 @@ module.exports = {
     //find one post by id
     //if no post, res.view('404')
     //res.view('post',foundPost)
-    res.json({error:"We can't view posts yet!"});
+    var postId = req.params.all().id;
+    return Post
+      .findOne({id:postId})
+      .then(function(foundPost){
+        if(!foundPost){
+          return res.view('404');
+        }
+        return res.view('post',foundPost);
+      });
   },
   getAll:function(req,res){
     //find all posts
