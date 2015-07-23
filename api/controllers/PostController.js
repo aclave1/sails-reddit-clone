@@ -40,6 +40,14 @@ module.exports = {
     //find all posts
     //subscribe socket to frontpage
     //send response: {payload:allposts}
+    return Post
+    .find()
+    .then(function(postList){
+      sails.sockets.join(req.socket,'frontpage');
+      res.json({
+        payload:postList
+      });
+    });
   },
   subscribeToPost:function(req,res){
     var post = req.params.all().post;
