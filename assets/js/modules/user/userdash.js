@@ -18,8 +18,10 @@ module.exports = [function(){
 
       function getUser(){
          $http.get('/user').then(function(response){
-            user.setUser(response.data.user);
-            $rootScope.$evalAsync();
+            if(typeof response.data.user !== 'undefined'){
+              user.setUser(response.data.user);
+              $rootScope.$evalAsync();
+            }
           });
       }
     }]

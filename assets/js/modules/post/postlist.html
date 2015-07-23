@@ -2,9 +2,14 @@
   <div>
     <ul class="list-group">
       <li class="list-group-item postlist-item" ng-repeat="post in postListCtrl.posts">
-      <img class="post-img" src="/img/reddit-alien.png" alt="">
+        <img class="post-img" src="/img/reddit-alien.png" alt=""/>
         <span class="title">
           <a ng-href="/post/{{post.id}}">{{post.title}}</a>
+        </span>
+      </li>
+      <li class="list-group-item postlist-item"ng-if="postListCtrl.posts.length < 1">
+        <span class="title">
+          <a>There are currently no posts available...</a>
         </span>
       </li>
     </ul>

@@ -11,14 +11,14 @@ module.exports = [function(){
 
 
       function init(){
-        vm.posts = [{title:"There are currently no posts available..."}];
+        vm.posts = [];
         getPostList();
         initFrontPage();
       }
 
       function getPostList(){
         io.get('/post',function(response){
-          if(response.payload){
+          if(response.payload.length > 0){
             vm.posts = response.payload;
             $scope.$evalAsync();
           }
