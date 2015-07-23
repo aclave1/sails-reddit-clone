@@ -26,7 +26,7 @@ module.exports = [function(){
       }
       function initFrontPage(){
         io.on('POST:CREATE',function(message){
-          vm.posts.push(message.payload);
+          vm.posts.unshift(message.payload);
           $scope.$evalAsync();
         });
       } 
