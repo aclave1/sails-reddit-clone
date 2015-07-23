@@ -2,6 +2,14 @@ module.exports = {
   getComments: function (req, res) {
     //find comments by params.post
     //send response: payload:comments
+    var params = req.params.all();
+    return Comment
+      .find({
+        post: params.post
+      })
+      .then(function (comments) {
+        res.json({payload: comments});
+      });
   },
   createComment: function (req, res) {
     //get username from session || "anonymous"
