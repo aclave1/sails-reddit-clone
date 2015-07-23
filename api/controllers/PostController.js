@@ -42,6 +42,7 @@ module.exports = {
     //send response: {payload:allposts}
     return Post
     .find()
+    .sort({createdAt:'DESC'})
     .then(function(postList){
       sails.sockets.join(req.socket,'frontpage');
       res.json({
