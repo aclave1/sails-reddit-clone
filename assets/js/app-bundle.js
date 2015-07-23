@@ -42060,7 +42060,7 @@
 /* 8 */
 /***/ function(module, exports) {
 
-	module.exports = "<div>\r\n  <user-dash></user-dash>\r\n  <div class=\"col-xs-8\">\r\n  <postlist></postlist>\r\n  </div>\r\n  <div class=\"col-xs-4\">\r\n    <sign-up></sign-up>\r\n    <create-post></create-post>\r\n  </div>\r\n</div>\r\n";
+	module.exports = "<div>\r\n  <user-dash></user-dash>\r\n  <div class=\"postlist-wrapper col-xs-8 panel panel-default\">\r\n  \t<postlist></postlist>\r\n  </div>\r\n  <div class=\"col-xs-4\">\r\n    <sign-up></sign-up>\r\n    <create-post></create-post>\r\n  </div>\r\n</div>\r\n";
 
 /***/ },
 /* 9 */
@@ -42141,8 +42141,10 @@
 
 	      function getUser(){
 	         $http.get('/user').then(function(response){
-	            user.setUser(response.data.user);
-	            $rootScope.$evalAsync();
+	            if(typeof response.data.user !== 'undefined'){
+	              user.setUser(response.data.user);
+	              $rootScope.$evalAsync();
+	            }
 	          });
 	      }
 	    }]
@@ -42154,7 +42156,7 @@
 /* 13 */
 /***/ function(module, exports) {
 
-	module.exports = "<div>\r\n  {{userdashCtrl.user.userName}}\r\n</div>\r\n";
+	module.exports = "<div>\r\n  Signed in as: {{userdashCtrl.user.userName}}\r\n</div>\r\n";
 
 /***/ },
 /* 14 */
@@ -42210,14 +42212,14 @@
 
 
 	      function init(){
-	        vm.posts = [{title:"There are currently no posts available..."}];
+	        vm.posts = [];
 	        getPostList();
 	        initFrontPage();
 	      }
 
 	      function getPostList(){
 	        io.get('/post',function(response){
-	          if(response.payload){
+	          if(response.payload.length > 0){
 	            vm.posts = response.payload;
 	            $scope.$evalAsync();
 	          }
@@ -42238,7 +42240,7 @@
 /* 17 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"postlist\">\r\n  <div>\r\n    <ul class=\"list-group\">\r\n      <li class=\"list-group-item postlist-item\" ng-repeat=\"post in postListCtrl.posts\">\r\n      <img class=\"post-img\" src=\"/img/reddit-alien.png\" alt=\"\">\r\n        <span class=\"title\">\r\n          <a ng-href=\"/post/{{post.id}}\">{{post.title}}</a>\r\n        </span>\r\n      </li>\r\n    </ul>\r\n  </div>\r\n</div>";
+	module.exports = "<div class=\"postlist\">\r\n  <div>\r\n    <ul class=\"list-group\">\r\n      <li class=\"list-group-item postlist-item\" ng-repeat=\"post in postListCtrl.posts\">\r\n        <img class=\"post-img\" src=\"/img/reddit-alien.png\" alt=\"\"/>\r\n        <span class=\"title\">\r\n          <a ng-href=\"/post/{{post.id}}\">{{post.title}}</a>\r\n        </span>\r\n      </li>\r\n      <li class=\"list-group-item postlist-item\"ng-if=\"postListCtrl.posts.length < 1\">\r\n        <span class=\"title\">\r\n          <a>There are currently no posts available...</a>\r\n        </span>\r\n      </li>\r\n    </ul>\r\n  </div>\r\n</div>";
 
 /***/ },
 /* 18 */
@@ -42292,7 +42294,7 @@
 
 	      function create(){
 	        io.post('/post',vm.form,function(response){
-	          window.location.href = response.link;
+	          window.location.href = '/post/'+response.payload.id;
 	        });
 	      }
 
@@ -42416,7 +42418,7 @@
 /* 26 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"comment\">\r\n  <div class=\"comment-username\">{{commentCtrl.data.userName}}</div>\r\n  {{commentCtrl.data.contents}}\r\n  <div class=\"comment-actionbar\">\r\n    <a ng-click=\"commentCtrl.toggleReply()\">reply</a>\r\n    <a href=\"#\">report</a>\r\n  </div>\r\n  <div>\r\n    <div ng-if=\"commentCtrl.data.reply\">\r\n      <create-comment-box data=\"commentCtrl.data\"></create-comment-box>\r\n    </div>\r\n  </div>\r\n</div>\r\n";
+	module.exports = "<div class=\"comment\">\r\n  <div class=\"comment-username\">{{commentCtrl.data.userName}}</div>\r\n  {{commentCtrl.data.contents}}\r\n  <div class=\"comment-actionbar\">\r\n    <a href ng-click=\"commentCtrl.toggleReply()\">reply</a>\r\n    <a href=\"#\">report</a>\r\n  </div>\r\n  <div>\r\n    <div ng-if=\"commentCtrl.data.reply\">\r\n      <create-comment-box data=\"commentCtrl.data\"></create-comment-box>\r\n    </div>\r\n  </div>\r\n</div>\r\n";
 
 /***/ },
 /* 27 */

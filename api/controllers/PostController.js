@@ -1,37 +1,24 @@
 module.exports = {
   create: function (req, res) {
-    var params = req.params.all();
-
-    if (!(params.title && params.contents))return res.json({error: 'invalid submission'});
-
-    return Post
-      .create({
-        title: params.title,
-        contents: params.contents,
-      })
-      .then(function (createdPost) {
-        var message = {
-          payload:createdPost
-        };
-        notifyFrontPageRoom(req,message);
-        res.json(message);
-      });
+    //validate params look like this: {title,contents}
+    //create post
+    //create response: {payload:createdPost}
+    //notify frontpage room with
+    //send json back to client
   },
   viewPost: function (req, res) {
-    var postId = req.params.all().id;
-    return Post
-      .findOne({id:postId})
-      .then(function(foundPost){
-        if(!foundPost){
-          return res.view('404');
-        }
-        return res.view('post',foundPost);
-      });
+    //extract id from params
+    //find one post by id
+    //if no post, res.view('404')
+    //res.view('post',foundPost)
+  },
+  getAll:function(req,res){
+    //find all posts
+    //subscribe socket to frontpage
+    //send response: {payload:allposts}
   },
   subscribeToPost:function(req,res){
-
     var post = req.params.all().post;
-    console.log("currently subscribed to: " + JSON.stringify(sails.sockets.socketRooms(req.socket)));
 
     sails
       .sockets
@@ -44,27 +31,12 @@ module.exports = {
 
       res.status(200);
       return res.json({status:"success"});
-  },
-  getAll:function(req,res){
-    return Post
-      .find()
-      .then(function(postList){
-        sails.sockets.join(req.socket,'frontpage');
-        res.json({
-          payload:postList
-        });
-      });
   }
 };
-
 
 function subscribeSocketToPost(req,post){
   console.log('subscribing: ' +sails.sockets.id(req.socket) + ' to: ' + getRoomNameFromPostId(post));
   sails.sockets.join(req.socket,getRoomNameFromPostId(post));
-}
-
-function unsubscribeSocketFromPost(req,post){
-  console.log('unsubscribing: '+ sails.sockets.id(req.socket) + ' from: ' + getRoomNameFromPostId(post));
 }
 
 
