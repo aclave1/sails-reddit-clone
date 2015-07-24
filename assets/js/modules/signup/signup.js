@@ -8,8 +8,17 @@ module.exports = function(){
     controller:['$rootScope','$http','io','user',function($rootScope,$http,io,user){
       var vm = this;
       vm.form = {};
+      vm.signup = signup;
       
-      vm.signup = function(){
+      init();
+
+      function init () {
+        $rootScope.$watch(user.getUser,function(user){
+          vm.signedIn = user.signedIn;
+        });
+      }
+      
+      function signup(){
         $http.post('/user',vm.form).then(function(response){
           var data = response.data;
           if(data.user){
