@@ -8,6 +8,7 @@ module.exports = function(){
     controller:['$rootScope','$http','io','user',function($rootScope,$http,io,user){
       var vm = this;
       vm.form = {};
+      
       vm.signup = function(){
         $http.post('/user',vm.form).then(function(response){
           var data = response.data;

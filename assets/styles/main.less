@@ -6,13 +6,21 @@ html,body{
   height:100%;
   min-height:1000px;
 }
-
 body{
   height:@bgheight;
-  background-color:white;
+  background-color:#ededed;
   font: normal large verdana,arial,helvetica,sans-serif;
 }
 
+h3{
+  margin:10px 0 10px 0;  
+}
+.btn-default{
+  background-color:#dcdcdc;
+}
+.panel-default>.panel-heading{
+  background-color:#dcdcdc;
+}
 ul{
   list-style-type: none;
   padding:5px;
@@ -26,8 +34,12 @@ ul{
 .main-content{
   height:100%;
 }
+.postlist{
+  padding:0;
+}
 .postlist-wrapper {
   min-height:200px;
+  padding:20px;
 }
 
 .outline{
@@ -70,6 +82,7 @@ ul{
   overflow:hidden;
   padding:10px;
   width:50%;
+  margin-bottom:20px;
 }
 .create-comment-textarea{
   margin-bottom:5px;
@@ -81,4 +94,16 @@ ul{
 .comment-username{
   font-size: 0.8em;
   color:grey;
+}
+
+.userdash{
+  margin-bottom:20px;
+}
+
+.comment-actionbar > a{
+  font-size:14px;
+}
+.create-post-btn
+{
+  width:100%;
 }
